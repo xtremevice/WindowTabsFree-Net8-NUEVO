@@ -1,0 +1,12 @@
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/bin/Debug/net8.0/WindowTabsFree.Common.deps.json
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/bin/Debug/net8.0/WindowTabsFree.Common.dll
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/bin/Debug/net8.0/WindowTabsFree.Common.pdb
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.AssemblyInfoInputs.cache
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.AssemblyInfo.cs
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.csproj.CoreCompileInputs.cache
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.sourcelink.json
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.dll
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/refint/WindowTabsFree.Common.dll
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/WindowTabsFree.Common.pdb
+/home/runner/work/WindowTabsFree-Net8-NUEVO/WindowTabsFree-Net8-NUEVO/src/WindowTabsFree.Common/obj/Debug/net8.0/ref/WindowTabsFree.Common.dll
