@@ -4,6 +4,16 @@
 
 ## 🚀 Quick Start
 
+### Download and Run
+
+For complete download instructions, see **[COMO_DESCARGAR_Y_EJECUTAR.md](COMO_DESCARGAR_Y_EJECUTAR.md)** (Spanish) or follow below:
+
+```bash
+# Clone the repository
+git clone https://github.com/xtremevice/WindowTabsFree-Net8-NUEVO.git
+cd WindowTabsFree-Net8-NUEVO
+```
+
 ### Prerequisites
 - .NET 8 SDK or Runtime
 - **Windows**: Windows 7+
