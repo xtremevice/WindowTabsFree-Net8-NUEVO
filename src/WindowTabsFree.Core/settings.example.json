@@ -1,0 +1,21 @@
+{
+  "TabSettings": {
+    "TabHeight": 30,
+    "ShowCloseButton": true,
+    "ShowIcons": true,
+    "MaxTabWidth": 200,
+    "MinTabWidth": 100
+  },
+  "StartWithWindows": false,
+  "ShowInSystemTray": true,
+  "MinimizeToTray": true,
+  "ExcludedApplications": [
+    "explorer",
+    "taskmgr"
+  ],
+  "HotKeys": {
+    "ToggleManagerWindow": "Ctrl+Alt+T",
+    "NextTab": "Ctrl+Tab",
+    "PreviousTab": "Ctrl+Shift+Tab"
+  }
+}
