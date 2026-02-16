@@ -97,6 +97,7 @@ WindowTabsFree-Net8/
 
 **Inicio Rápido:**
 - **COMO_DESCARGAR_Y_EJECUTAR.md** ⭐ **(NUEVO - Empieza aquí)**
+- **COMANDOS_RAPIDOS.md** 📌 **(Tarjeta de referencia)**
 - LEEME_PRIMERO.md (este archivo)
 - QUICKSTART_ES.md
 - QUICKSTART.md
