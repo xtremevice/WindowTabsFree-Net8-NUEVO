@@ -66,6 +66,11 @@ public class WindowInfo
     public bool IsActiveInGroup { get; set; }
 
     /// <summary>
+    /// Whether this window is NOT the active window in its group (for XAML binding)
+    /// </summary>
+    public bool IsInactive => !IsActiveInGroup;
+
+    /// <summary>
     /// Display title - returns Title if available, otherwise ProcessName
     /// Useful for windows that don't have a title (Terminal, games, etc.)
     /// </summary>

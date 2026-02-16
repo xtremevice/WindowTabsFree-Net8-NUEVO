@@ -71,7 +71,7 @@
                                                    Padding="8,6"
                                                    Height="35"
                                                    Background="White"
-                                                   IsVisible="{Binding !IsActiveInGroup}">
+                                                   IsVisible="{Binding IsInactive}">
                                                 <TextBlock Text="{Binding DisplayTitle}" 
                                                           FontSize="11" 
                                                           TextWrapping="NoWrap"

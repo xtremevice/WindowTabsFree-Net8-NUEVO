@@ -21,13 +21,22 @@ namespace WindowTabsFree.UI.Views
         {
             var settings = _configService.Settings;
             
-            NextWindowTextBox.Text = settings.HotKeys.NextWindow ?? "";
-            PreviousWindowTextBox.Text = settings.HotKeys.PreviousWindow ?? "";
+            if (settings.HotKeys != null)
+            {
+                NextWindowTextBox.Text = settings.HotKeys.NextWindow ?? "";
+                PreviousWindowTextBox.Text = settings.HotKeys.PreviousWindow ?? "";
+            }
         }
 
         private void SaveButton_Click(object? sender, RoutedEventArgs e)
         {
             var settings = _configService.Settings;
+            
+            // Ensure HotKeys object exists
+            if (settings.HotKeys == null)
+            {
+                settings.HotKeys = new WindowTabsFree.Common.Models.HotKeysSettings();
+            }
             
             // Update hotkey settings
             settings.HotKeys.NextWindow = NextWindowTextBox.Text?.Trim();
