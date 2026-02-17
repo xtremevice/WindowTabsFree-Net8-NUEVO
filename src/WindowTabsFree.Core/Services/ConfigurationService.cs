@@ -101,20 +101,30 @@ public class ConfigurationService : IConfigurationService
                 "StartMenuExperienceHost",
                 "SystemSettings",
                 
-                // macOS system processes
+                // macOS system processes - comprehensive list with all case variations
                 "Dock",
+                "dock",
                 "Control Center",
                 "ControlCenter",
+                "control center",
+                "controlcenter",
                 "NotificationCenter",
                 "Notification Center",
+                "notification center",
+                "notificationcenter",
                 "SystemUIServer",
                 "WindowServer",
+                "Window Server",
+                "windowserver",
                 "loginwindow",
                 "CoreServicesUIAgent",
                 "UserEventAgent",
                 "Problem Reporter",
                 "ProblemReporter",
+                "problem reporter",
+                "problemreporter",
                 "Spotlight",
+                "spotlight",
                 // Additional macOS system UI components
                 "ReportCrash",
                 "CrashReporter",
@@ -123,14 +133,11 @@ public class ConfigurationService : IConfigurationService
                 "com.apple.controlcenter",
                 "com.apple.notificationcenterui",
                 "com.apple.problemreporter",
+                "com.apple.dock",
+                "com.apple.WindowServer",
                 // More macOS variants
                 "NC",
                 "NCBulletinBoard",
-                "NotificationCenterUI",
-                "notificationcenterui",
-                "controlcenter",
-                "control center",
-                "notification center",
                 
                 // Linux system processes
                 "gnome-shell",

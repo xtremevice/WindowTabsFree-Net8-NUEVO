@@ -170,6 +170,11 @@ public class MacOSWindowService : IWindowService, IDisposable
                     if (nullIndex >= 0)
                     {
                         windowInfo.ProcessName = System.Text.Encoding.UTF8.GetString(buffer, 0, nullIndex);
+                        // Debug output to help identify system processes
+                        if (!string.IsNullOrWhiteSpace(windowInfo.ProcessName))
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[macOS] Detected process: '{windowInfo.ProcessName}'");
+                        }
                     }
                 }
             }
