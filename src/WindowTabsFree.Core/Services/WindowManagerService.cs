@@ -455,7 +455,7 @@ public class WindowManagerService
             currentGroup.LastModifiedAt = DateTime.UtcNow;
             
             _windowService.SetFocus(currentGroup.WindowHandles[nextIndex]);
-            _configurationService.SaveSettings(_configurationService.Settings);
+            // Note: Settings will be saved periodically or on app shutdown to avoid excessive disk I/O
         }
         else
         {
@@ -485,7 +485,7 @@ public class WindowManagerService
             currentGroup.LastModifiedAt = DateTime.UtcNow;
             
             _windowService.SetFocus(currentGroup.WindowHandles[prevIndex]);
-            _configurationService.SaveSettings(_configurationService.Settings);
+            // Note: Settings will be saved periodically or on app shutdown to avoid excessive disk I/O
         }
         else
         {
