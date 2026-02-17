@@ -66,6 +66,66 @@ sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
 
 ## Solución de Problemas
 
+### ⚠️ Error -50 Cuando se Ejecuta desde Terminal
+
+**Síntoma:** Aparece el error:
+```
+[macOS] RegisterEventHotKey failed with code: -50
+[macOS] Error -50 typically means missing Accessibility permissions
+```
+
+Y en Configuración del Sistema → Accesibilidad aparece "Terminal" o "iTerm2" en lugar de WindowTabsFree.
+
+**Explicación:**
+Cuando ejecutas la aplicación usando `dotnet run` o `dotnet exec` desde la Terminal, macOS ve que el proceso padre es Terminal o el ejecutable `dotnet`. Aunque hayas dado permisos a Terminal, la aplicación real necesita sus propios permisos.
+
+**Solución 1 (Recomendada): Ejecutar como App Nativa**
+
+1. Compila la aplicación como un bundle de macOS:
+```bash
+cd /ruta/a/WindowTabsFree-Net8-NUEVO
+dotnet publish -c Release -r osx-arm64 --self-contained src/WindowTabsFree.UI/WindowTabsFree.UI.csproj
+```
+
+2. La aplicación compilada estará en:
+```
+src/WindowTabsFree.UI/bin/Release/net8.0/osx-arm64/publish/
+```
+
+3. Ejecuta la app desde Finder (no desde Terminal):
+   - Navega a la carpeta en Finder
+   - Haz doble clic en `WindowTabsFree.UI`
+   - ⚠️ Si macOS dice que no puede abrirla por seguridad:
+     - Ve a Configuración del Sistema → Privacidad y Seguridad
+     - Verás un mensaje sobre WindowTabsFree.UI bloqueado
+     - Haz clic en "Abrir de todos modos"
+
+4. Ahora WindowTabsFree.UI aparecerá en Accesibilidad (no Terminal)
+5. Habilita los permisos de Accesibilidad para WindowTabsFree.UI
+6. ¡Los atajos deberían funcionar!
+
+**Solución 2 (Si debes ejecutar desde Terminal):**
+
+Si necesitas ejecutar desde Terminal por desarrollo u otras razones:
+
+1. Abre **Configuración del Sistema** → **Privacidad y Seguridad** → **Accesibilidad**
+2. Haz clic en el icono de candado 🔒 e ingresa tu contraseña
+3. Haz clic en el botón **+** para agregar una aplicación
+4. Navega a donde está instalado `dotnet`:
+   - Ubicación común: `/usr/local/share/dotnet/dotnet`
+   - O encuentra la ubicación con: `which dotnet` en Terminal
+5. Agrega `dotnet` a la lista
+6. Asegúrate de que la casilla junto a `dotnet` esté **habilitada** ✓
+7. **También** agrega Terminal/iTerm2 si aún no está
+8. Reinicia la aplicación desde Terminal
+
+**¿Por qué sucede esto?**
+
+- Terminal ejecuta → `dotnet` ejecuta → WindowTabsFree.UI
+- macOS verifica permisos en cada nivel de la cadena
+- Si `dotnet` no tiene permisos, WindowTabsFree.UI tampoco puede usarlos
+- Es por eso que dar permisos solo a Terminal no es suficiente
+
 ### ¿Los Atajos Siguen Sin Funcionar?
 
 1. **Verifica la combinación de teclas**: Asegúrate de que tu atajo no entre en conflicto con atajos del sistema

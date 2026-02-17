@@ -38,6 +38,16 @@ public class MacOSHotkeyService : IHotkeyService
     // Simplified version - just check if trusted, no automatic prompt
     [DllImport("/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
     private static extern bool AXIsProcessTrusted();
+    
+    // P/Invoke for process info
+    [DllImport("libc")]
+    private static extern int getpid();
+    
+    [DllImport("libc")]
+    private static extern int getppid();
+    
+    [DllImport("libc")]
+    private static extern int proc_name(int pid, byte[] buffer, uint buffersize);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct EventHotKeyID
@@ -47,6 +57,48 @@ public class MacOSHotkeyService : IHotkeyService
     }
 
     /// <summary>
+    /// Gets the current process name
+    /// </summary>
+    private static string GetCurrentProcessName()
+    {
+        try
+        {
+            int pid = getpid();
+            byte[] buffer = new byte[256];
+            int result = proc_name(pid, buffer, (uint)buffer.Length);
+            
+            if (result > 0)
+            {
+                return System.Text.Encoding.UTF8.GetString(buffer, 0, result);
+            }
+        }
+        catch { }
+        
+        return "unknown";
+    }
+    
+    /// <summary>
+    /// Gets the parent process name
+    /// </summary>
+    private static string GetParentProcessName()
+    {
+        try
+        {
+            int ppid = getppid();
+            byte[] buffer = new byte[256];
+            int result = proc_name(ppid, buffer, (uint)buffer.Length);
+            
+            if (result > 0)
+            {
+                return System.Text.Encoding.UTF8.GetString(buffer, 0, result);
+            }
+        }
+        catch { }
+        
+        return "unknown";
+    }
+    
+    /// <summary>
     /// Checks if the app has Accessibility permissions
     /// Returns true if permissions are granted, false otherwise
     /// </summary>
@@ -55,6 +107,13 @@ public class MacOSHotkeyService : IHotkeyService
         try
         {
             Console.WriteLine("[macOS] Checking Accessibility permissions for hotkeys...");
+            
+            // Get process information
+            string currentProcess = GetCurrentProcessName();
+            string parentProcess = GetParentProcessName();
+            
+            Console.WriteLine($"[macOS] Current process: {currentProcess}");
+            Console.WriteLine($"[macOS] Parent process: {parentProcess}");
             
             // Check if process is trusted (simplified API - no options)
             bool isTrusted = AXIsProcessTrusted();
@@ -69,15 +128,41 @@ public class MacOSHotkeyService : IHotkeyService
                 Console.WriteLine("[macOS] ");
                 Console.WriteLine("[macOS] HOTKEYS WILL NOT WORK without Accessibility permissions!");
                 Console.WriteLine("[macOS] ");
-                Console.WriteLine("[macOS] To enable hotkeys:");
-                Console.WriteLine("[macOS] 1. Open System Settings (or System Preferences)");
-                Console.WriteLine("[macOS] 2. Go to Privacy & Security → Accessibility");
-                Console.WriteLine("[macOS] 3. Click the lock icon and authenticate");
-                Console.WriteLine("[macOS] 4. Find 'WindowTabsFree.UI' or 'dotnet' in the list");
-                Console.WriteLine("[macOS] 5. Enable the checkbox next to it");
-                Console.WriteLine("[macOS] 6. Restart WindowTabsFree");
-                Console.WriteLine("[macOS] ");
-                Console.WriteLine("[macOS] For detailed instructions, see: MACOS_HOTKEYS_SETUP.md");
+                
+                // Special message if running from Terminal or via dotnet
+                if (parentProcess.Contains("Terminal") || parentProcess.Contains("iTerm") || 
+                    currentProcess.Contains("dotnet") || parentProcess.Contains("dotnet"))
+                {
+                    Console.WriteLine("[macOS] ⚠️  IMPORTANT: You are running via Terminal/dotnet!");
+                    Console.WriteLine("[macOS] ");
+                    Console.WriteLine("[macOS] When running from Terminal, you need to grant permissions to:");
+                    Console.WriteLine($"[macOS]   - '{currentProcess}' (this process)");
+                    Console.WriteLine($"[macOS]   - AND/OR 'dotnet' (if running via dotnet command)");
+                    Console.WriteLine("[macOS] ");
+                    Console.WriteLine("[macOS] RECOMMENDED SOLUTION:");
+                    Console.WriteLine("[macOS] 1. Build and run as a proper macOS app bundle:");
+                    Console.WriteLine("[macOS]    dotnet publish -c Release -r osx-arm64 --self-contained");
+                    Console.WriteLine("[macOS]    Then run the .app bundle from Finder");
+                    Console.WriteLine("[macOS] ");
+                    Console.WriteLine("[macOS] ALTERNATIVE (if you must run from Terminal):");
+                    Console.WriteLine("[macOS] 1. Open System Settings → Privacy & Security → Accessibility");
+                    Console.WriteLine("[macOS] 2. Add BOTH 'Terminal' AND 'dotnet' to the list");
+                    Console.WriteLine("[macOS] 3. Make sure both are checked/enabled");
+                    Console.WriteLine("[macOS] 4. Restart this application");
+                    Console.WriteLine("[macOS] ");
+                }
+                else
+                {
+                    Console.WriteLine("[macOS] To enable hotkeys:");
+                    Console.WriteLine("[macOS] 1. Open System Settings (or System Preferences)");
+                    Console.WriteLine("[macOS] 2. Go to Privacy & Security → Accessibility");
+                    Console.WriteLine("[macOS] 3. Click the lock icon and authenticate");
+                    Console.WriteLine($"[macOS] 4. Find '{currentProcess}' in the list and enable it");
+                    Console.WriteLine("[macOS] 5. Restart WindowTabsFree");
+                    Console.WriteLine("[macOS] ");
+                }
+                
+                Console.WriteLine("[macOS] For detailed instructions, see: MACOS_HOTKEYS_SETUP_ES.md");
             }
 
             return isTrusted;
@@ -126,9 +211,43 @@ public class MacOSHotkeyService : IHotkeyService
                     // If error is -50 (parameter error), it's likely a permissions issue
                     if (result == -50)
                     {
-                        Console.WriteLine($"[macOS] Error -50 typically means missing Accessibility permissions");
-                        Console.WriteLine($"[macOS] The system should have prompted for permissions on app launch");
-                        Console.WriteLine($"[macOS] If not, please check System Settings → Privacy & Security → Accessibility");
+                        Console.WriteLine($"[macOS] ");
+                        Console.WriteLine($"[macOS] ❌ Error -50 means MISSING ACCESSIBILITY PERMISSIONS");
+                        Console.WriteLine($"[macOS] ");
+                        
+                        string currentProcess = GetCurrentProcessName();
+                        string parentProcess = GetParentProcessName();
+                        
+                        if (parentProcess.Contains("Terminal") || parentProcess.Contains("iTerm") || 
+                            currentProcess.Contains("dotnet") || parentProcess.Contains("dotnet"))
+                        {
+                            Console.WriteLine($"[macOS] ⚠️  You are running from Terminal/dotnet!");
+                            Console.WriteLine($"[macOS] ");
+                            Console.WriteLine($"[macOS] THE PROBLEM:");
+                            Console.WriteLine($"[macOS] - You gave permissions to 'Terminal' in System Settings");
+                            Console.WriteLine($"[macOS] - But the actual process is '{currentProcess}'");
+                            Console.WriteLine($"[macOS] - macOS needs permissions for '{currentProcess}' OR 'dotnet'");
+                            Console.WriteLine($"[macOS] ");
+                            Console.WriteLine($"[macOS] SOLUTION 1 (Recommended):");
+                            Console.WriteLine($"[macOS] Build as a proper macOS app bundle:");
+                            Console.WriteLine($"[macOS]   dotnet publish -c Release -r osx-arm64 --self-contained");
+                            Console.WriteLine($"[macOS]   Then run the .app from Finder (not Terminal)");
+                            Console.WriteLine($"[macOS] ");
+                            Console.WriteLine($"[macOS] SOLUTION 2 (If running from Terminal):");
+                            Console.WriteLine($"[macOS] 1. Open System Settings → Privacy & Security → Accessibility");
+                            Console.WriteLine($"[macOS] 2. Click the '+' button");
+                            Console.WriteLine($"[macOS] 3. Navigate to /usr/local/share/dotnet/dotnet");
+                            Console.WriteLine($"[macOS]    (or wherever 'dotnet' is installed)");
+                            Console.WriteLine($"[macOS] 4. Add 'dotnet' and enable it");
+                            Console.WriteLine($"[macOS] 5. Restart this application");
+                            Console.WriteLine($"[macOS] ");
+                            Console.WriteLine($"[macOS] Note: Giving permissions to 'Terminal' alone is NOT enough!");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[macOS] Please check System Settings → Privacy & Security → Accessibility");
+                            Console.WriteLine($"[macOS] Make sure '{currentProcess}' is in the list and enabled");
+                        }
                     }
                     else
                     {

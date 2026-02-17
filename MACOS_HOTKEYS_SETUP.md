@@ -66,6 +66,66 @@ sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
 
 ## Troubleshooting
 
+### ⚠️ Error -50 When Running from Terminal
+
+**Symptom:** You see the error:
+```
+[macOS] RegisterEventHotKey failed with code: -50
+[macOS] Error -50 typically means missing Accessibility permissions
+```
+
+And in System Settings → Accessibility you see "Terminal" or "iTerm2" instead of WindowTabsFree.
+
+**Explanation:**
+When you run the application using `dotnet run` or `dotnet exec` from Terminal, macOS sees the parent process as Terminal or the `dotnet` executable. Even if you've granted permissions to Terminal, the actual application needs its own permissions.
+
+**Solution 1 (Recommended): Run as Native App**
+
+1. Build the application as a macOS bundle:
+```bash
+cd /path/to/WindowTabsFree-Net8-NUEVO
+dotnet publish -c Release -r osx-arm64 --self-contained src/WindowTabsFree.UI/WindowTabsFree.UI.csproj
+```
+
+2. The compiled app will be in:
+```
+src/WindowTabsFree.UI/bin/Release/net8.0/osx-arm64/publish/
+```
+
+3. Run the app from Finder (not Terminal):
+   - Navigate to the folder in Finder
+   - Double-click `WindowTabsFree.UI`
+   - ⚠️ If macOS says it can't open it for security:
+     - Go to System Settings → Privacy & Security
+     - You'll see a message about WindowTabsFree.UI being blocked
+     - Click "Open Anyway"
+
+4. Now WindowTabsFree.UI will appear in Accessibility (not Terminal)
+5. Enable Accessibility permissions for WindowTabsFree.UI
+6. Hotkeys should work!
+
+**Solution 2 (If you must run from Terminal):**
+
+If you need to run from Terminal for development or other reasons:
+
+1. Open **System Settings** → **Privacy & Security** → **Accessibility**
+2. Click the lock icon 🔒 and enter your password
+3. Click the **+** button to add an application
+4. Navigate to where `dotnet` is installed:
+   - Common location: `/usr/local/share/dotnet/dotnet`
+   - Or find the location with: `which dotnet` in Terminal
+5. Add `dotnet` to the list
+6. Make sure the checkbox next to `dotnet` is **enabled** ✓
+7. **Also** add Terminal/iTerm2 if it's not already there
+8. Restart the application from Terminal
+
+**Why does this happen?**
+
+- Terminal runs → `dotnet` runs → WindowTabsFree.UI
+- macOS checks permissions at each level of the chain
+- If `dotnet` doesn't have permissions, WindowTabsFree.UI can't use them either
+- That's why giving permissions to Terminal alone isn't enough
+
 ### Hotkeys Still Not Working?
 
 1. **Check key combination**: Ensure your hotkey doesn't conflict with system shortcuts
