@@ -4,34 +4,24 @@
 
 WindowTabsFree utiliza atajos de teclado globales para cambiar entre ventanas. En macOS, los atajos globales requieren **permisos de Accesibilidad** para funcionar correctamente.
 
-**NUEVO:** ¡La aplicación ahora solicita automáticamente estos permisos cuando la inicias por primera vez!
+## Verificación de Permisos al Iniciar
 
-## Solicitud Automática de Permisos
+Cuando inicias WindowTabsFree en macOS, automáticamente verifica si tiene permisos de Accesibilidad:
 
-Cuando inicias WindowTabsFree por primera vez en macOS, el sistema mostrará automáticamente un diálogo solicitando permisos de Accesibilidad.
+- **Si los permisos están concedidos:** ✓ Los atajos funcionarán inmediatamente
+- **Si los permisos NO están concedidos:** ✗ Verás instrucciones en la consola sobre cómo habilitarlos
 
-**Lo que verás:**
-- Un diálogo del sistema diciendo que WindowTabsFree quiere controlar tu computadora
-- Esto es normal y necesario para la funcionalidad de los atajos de teclado
-
-**Qué hacer:**
-1. Haz clic en **Abrir Configuración del Sistema** en el diálogo
-2. En la configuración de Seguridad y Privacidad que se abre, haz clic en el candado 🔒 para hacer cambios
-3. Marca la casilla junto a WindowTabsFree en la lista de Accesibilidad
-4. Reinicia WindowTabsFree
-
-## Error Común
-
-Si ves este error en la consola:
-```
-[macOS] Attempting to register hotkey: Ctrl+Z
-[macOS] RegisterEventHotKey failed with code: -50
-[macOS] Note: Global hotkeys may require Accessibility permissions on modern macOS
-```
-
-Esto significa que la aplicación necesita permisos de Accesibilidad.
+**Importante:** A diferencia de algunas aplicaciones, WindowTabsFree no puede mostrar automáticamente el diálogo de permisos del sistema. Debes habilitar los permisos manualmente en Configuración del Sistema.
 
 ## Cómo Habilitar Permisos de Accesibilidad
+
+Si ves este mensaje en la consola:
+```
+[macOS] ✗ Accessibility permissions NOT granted
+[macOS] HOTKEYS WILL NOT WORK without Accessibility permissions!
+```
+
+Sigue estos pasos:
 
 ### Paso 1: Abrir Configuración del Sistema
 

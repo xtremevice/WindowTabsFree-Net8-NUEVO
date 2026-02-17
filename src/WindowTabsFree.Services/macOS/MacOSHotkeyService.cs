@@ -35,91 +35,9 @@ public class MacOSHotkeyService : IHotkeyService
     private static extern int UnregisterEventHotKey(IntPtr inHotKey);
 
     // P/Invoke declarations for Accessibility APIs
+    // Simplified version - just check if trusted, no automatic prompt
     [DllImport("/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
-    private static extern bool AXIsProcessTrustedWithOptions(IntPtr options);
-
-    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
-    private static extern IntPtr CFDictionaryCreate(IntPtr allocator, IntPtr[] keys, IntPtr[] values,
-        int numValues, IntPtr keyCallBacks, IntPtr valueCallBacks);
-
-    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
-    private static extern IntPtr CFStringCreateWithCString(IntPtr allocator, string cStr, uint encoding);
-
-    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
-    private static extern void CFRelease(IntPtr cf);
-    
-    // Get the kCFBooleanTrue constant - this is a global constant in CoreFoundation
-    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
-    private static extern IntPtr CFBooleanGetValue(IntPtr boolean);
-
-    private const uint kCFStringEncodingUTF8 = 0x08000100;
-    private static readonly string kAXTrustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt";
-
-    // Lazy-loaded kCFBooleanTrue constant with thread-safe initialization
-    private static readonly object _cfBooleanTrueLock = new object();
-    private static IntPtr? _cfBooleanTrue = null;
-    
-    private static IntPtr GetCFBooleanTrue()
-    {
-        // Thread-safe lazy initialization
-        lock (_cfBooleanTrueLock)
-        {
-            if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
-            {
-                // Get the address of kCFBooleanTrue from the framework
-                // It's exported as a symbol, we need to use dlsym to get it
-                IntPtr handle = dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", RTLD_NOW);
-                if (handle != IntPtr.Zero)
-                {
-                    IntPtr symbolAddr = dlsym(handle, "kCFBooleanTrue");
-                    if (symbolAddr != IntPtr.Zero)
-                    {
-                        // Dereference the pointer to get the actual kCFBooleanTrue value
-                        _cfBooleanTrue = Marshal.ReadIntPtr(symbolAddr);
-                        Console.WriteLine("[macOS] Successfully loaded kCFBooleanTrue constant");
-                    }
-                    else
-                    {
-                        Console.WriteLine("[macOS] Warning: Could not find kCFBooleanTrue symbol in CoreFoundation");
-                        // Try to get error from dlerror
-                        IntPtr errorPtr = dlerror();
-                        if (errorPtr != IntPtr.Zero)
-                        {
-                            string? error = Marshal.PtrToStringAnsi(errorPtr);
-                            Console.WriteLine($"[macOS] dlsym error: {error}");
-                        }
-                    }
-                    dlclose(handle);
-                }
-                else
-                {
-                    Console.WriteLine("[macOS] Warning: Could not open CoreFoundation framework");
-                }
-                
-                // If we still couldn't get it, set to Zero
-                if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
-                {
-                    _cfBooleanTrue = IntPtr.Zero;
-                }
-            }
-        }
-        return _cfBooleanTrue.Value;
-    }
-
-    // Dynamic library loading functions - use libSystem for better compatibility
-    [DllImport("libSystem")]
-    private static extern IntPtr dlopen(string filename, int flags);
-    
-    [DllImport("libSystem")]
-    private static extern IntPtr dlsym(IntPtr handle, string symbol);
-    
-    [DllImport("libSystem")]
-    private static extern int dlclose(IntPtr handle);
-    
-    [DllImport("libSystem")]
-    private static extern IntPtr dlerror();
-    
-    private const int RTLD_NOW = 2;
+    private static extern bool AXIsProcessTrusted();
 
     [StructLayout(LayoutKind.Sequential)]
     private struct EventHotKeyID
@@ -129,67 +47,37 @@ public class MacOSHotkeyService : IHotkeyService
     }
 
     /// <summary>
-    /// Checks if the app has Accessibility permissions and prompts user if not
+    /// Checks if the app has Accessibility permissions
+    /// Returns true if permissions are granted, false otherwise
     /// </summary>
     public static bool CheckAndRequestAccessibilityPermissions()
     {
         try
         {
-            // Get kCFBooleanTrue constant
-            IntPtr cfTrue = GetCFBooleanTrue();
-            if (cfTrue == IntPtr.Zero)
-            {
-                Console.WriteLine("[macOS] Failed to get kCFBooleanTrue constant");
-                Console.WriteLine("[macOS] Will check permissions without prompt option");
-                
-                // Fall back to checking without prompting
-                return AXIsProcessTrustedWithOptions(IntPtr.Zero);
-            }
+            Console.WriteLine("[macOS] Checking Accessibility permissions for hotkeys...");
             
-            // Create the prompt key
-            IntPtr promptKey = CFStringCreateWithCString(IntPtr.Zero, kAXTrustedCheckOptionPrompt, kCFStringEncodingUTF8);
-            
-            if (promptKey == IntPtr.Zero)
-            {
-                Console.WriteLine("[macOS] Failed to create prompt key");
-                return false;
-            }
-            
-            // Create dictionary with the prompt option
-            IntPtr[] keys = new IntPtr[] { promptKey };
-            IntPtr[] values = new IntPtr[] { cfTrue };
-            
-            IntPtr options = CFDictionaryCreate(
-                IntPtr.Zero,  // default allocator
-                keys,
-                values,
-                1,            // one key-value pair
-                IntPtr.Zero,  // default key callbacks
-                IntPtr.Zero   // default value callbacks
-            );
-
-            if (options == IntPtr.Zero)
-            {
-                CFRelease(promptKey);
-                Console.WriteLine("[macOS] Failed to create options dictionary");
-                return false;
-            }
-
-            // Check if process is trusted, this will show the system dialog if not
-            bool isTrusted = AXIsProcessTrustedWithOptions(options);
-
-            // Clean up
-            CFRelease(options);
-            CFRelease(promptKey);
+            // Check if process is trusted (simplified API - no options)
+            bool isTrusted = AXIsProcessTrusted();
 
             if (isTrusted)
             {
-                Console.WriteLine("[macOS] Accessibility permissions already granted ✓");
+                Console.WriteLine("[macOS] ✓ Accessibility permissions already granted");
             }
             else
             {
-                Console.WriteLine("[macOS] Accessibility permissions required - system dialog should appear");
-                Console.WriteLine("[macOS] Please grant permissions in System Settings and restart the app");
+                Console.WriteLine("[macOS] ✗ Accessibility permissions NOT granted");
+                Console.WriteLine("[macOS] ");
+                Console.WriteLine("[macOS] HOTKEYS WILL NOT WORK without Accessibility permissions!");
+                Console.WriteLine("[macOS] ");
+                Console.WriteLine("[macOS] To enable hotkeys:");
+                Console.WriteLine("[macOS] 1. Open System Settings (or System Preferences)");
+                Console.WriteLine("[macOS] 2. Go to Privacy & Security → Accessibility");
+                Console.WriteLine("[macOS] 3. Click the lock icon and authenticate");
+                Console.WriteLine("[macOS] 4. Find 'WindowTabsFree.UI' or 'dotnet' in the list");
+                Console.WriteLine("[macOS] 5. Enable the checkbox next to it");
+                Console.WriteLine("[macOS] 6. Restart WindowTabsFree");
+                Console.WriteLine("[macOS] ");
+                Console.WriteLine("[macOS] For detailed instructions, see: MACOS_HOTKEYS_SETUP.md");
             }
 
             return isTrusted;

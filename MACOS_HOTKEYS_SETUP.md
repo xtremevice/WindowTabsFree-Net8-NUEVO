@@ -4,34 +4,24 @@
 
 WindowTabsFree uses global hotkeys to switch between windows. On macOS, global hotkeys require **Accessibility permissions** to function properly.
 
-**NEW:** The app now automatically requests these permissions when you first launch it!
+## Permission Check on Launch
 
-## Automatic Permission Request
+When you launch WindowTabsFree on macOS, it will automatically check if it has Accessibility permissions:
 
-When you launch WindowTabsFree for the first time on macOS, the system will automatically show a dialog requesting Accessibility permissions. 
+- **If permissions are granted:** ✓ Hotkeys will work immediately
+- **If permissions are NOT granted:** ✗ You'll see instructions in the console on how to enable them
 
-**What you'll see:**
-- A system dialog saying WindowTabsFree wants to control your computer
-- This is normal and required for hotkey functionality
-
-**What to do:**
-1. Click **Open System Settings** in the dialog
-2. In the Security & Privacy settings that open, click the lock 🔒 to make changes
-3. Check the box next to WindowTabsFree in the Accessibility list
-4. Restart WindowTabsFree
-
-## Common Error
-
-If you see this error in the console:
-```
-[macOS] Attempting to register hotkey: Ctrl+Z
-[macOS] RegisterEventHotKey failed with code: -50
-[macOS] Note: Global hotkeys may require Accessibility permissions on modern macOS
-```
-
-This means the application needs Accessibility permissions.
+**Important:** Unlike some apps, WindowTabsFree cannot automatically show the system permission dialog. You must manually enable permissions in System Settings.
 
 ## How to Enable Accessibility Permissions
+
+If you see this message in the console:
+```
+[macOS] ✗ Accessibility permissions NOT granted
+[macOS] HOTKEYS WILL NOT WORK without Accessibility permissions!
+```
+
+Follow these steps:
 
 ### Step 1: Open System Settings
 
