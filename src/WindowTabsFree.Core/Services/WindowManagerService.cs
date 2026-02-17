@@ -397,4 +397,40 @@ public class WindowManagerService
             .FirstOrDefault(s => s.ProcessName == processName);
         return setting?.IsAutoGroupEnabled ?? false;
     }
+
+    /// <summary>
+    /// Activates the next window globally (cycles through all manageable windows)
+    /// </summary>
+    public void ActivateNextWindowGlobally()
+    {
+        var windows = GetManageableWindows().ToList();
+        if (windows.Count == 0)
+            return;
+
+        var currentWindow = _windowService.GetForegroundWindow();
+        var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
+        
+        // If current window is not in the list or is the last one, go to first
+        var nextIndex = (currentIndex + 1) % windows.Count;
+        
+        _windowService.SetFocus(windows[nextIndex].Handle);
+    }
+
+    /// <summary>
+    /// Activates the previous window globally (cycles through all manageable windows)
+    /// </summary>
+    public void ActivatePreviousWindowGlobally()
+    {
+        var windows = GetManageableWindows().ToList();
+        if (windows.Count == 0)
+            return;
+
+        var currentWindow = _windowService.GetForegroundWindow();
+        var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
+        
+        // If current window is not in the list or is the first one, go to last
+        var prevIndex = currentIndex <= 0 ? windows.Count - 1 : currentIndex - 1;
+        
+        _windowService.SetFocus(windows[prevIndex].Handle);
+    }
 }

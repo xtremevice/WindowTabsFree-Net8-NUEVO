@@ -533,4 +533,11 @@ public class MacOSWindowService : IWindowService, IDisposable
     {
         Dispose(false);
     }
+
+    public IntPtr GetForegroundWindow()
+    {
+        // TODO: Implement for macOS
+        // Would need to use NSWorkspace.SharedWorkspace.FrontmostApplication
+        return IntPtr.Zero;
+    }
 }

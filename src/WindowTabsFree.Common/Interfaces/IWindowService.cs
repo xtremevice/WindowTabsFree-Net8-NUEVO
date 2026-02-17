@@ -62,4 +62,10 @@ public interface IWindowService
     /// <param name="handle">Window handle</param>
     /// <returns>True if valid, false otherwise</returns>
     bool IsWindowValid(IntPtr handle);
+
+    /// <summary>
+    /// Gets the currently focused (foreground) window handle
+    /// </summary>
+    /// <returns>Handle of the foreground window</returns>
+    IntPtr GetForegroundWindow();
 }

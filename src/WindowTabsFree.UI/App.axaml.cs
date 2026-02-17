@@ -71,13 +71,7 @@ public partial class App : Application
             {
                 try
                 {
-                    var groups = _windowManager.GetTabGroups().ToList();
-                    if (groups.Count > 0)
-                    {
-                        // Cycle through the first group's windows
-                        var firstGroup = groups[0];
-                        _windowManager.ActivateNextWindowInGroup(firstGroup.Id);
-                    }
+                    _windowManager.ActivateNextWindowGlobally();
                 }
                 catch (Exception ex)
                 {
@@ -93,13 +87,7 @@ public partial class App : Application
             {
                 try
                 {
-                    var groups = _windowManager.GetTabGroups().ToList();
-                    if (groups.Count > 0)
-                    {
-                        // Cycle through the first group's windows
-                        var firstGroup = groups[0];
-                        _windowManager.ActivatePreviousWindowInGroup(firstGroup.Id);
-                    }
+                    _windowManager.ActivatePreviousWindowGlobally();
                 }
                 catch (Exception ex)
                 {

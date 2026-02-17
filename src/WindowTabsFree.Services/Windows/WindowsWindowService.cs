@@ -50,6 +50,9 @@ public class WindowsWindowService : IWindowService
     private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
     [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
     private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll")]
@@ -205,5 +208,10 @@ public class WindowsWindowService : IWindowService
         var builder = new StringBuilder(256);
         GetClassName(hWnd, builder, builder.Capacity);
         return builder.ToString();
+    }
+
+    IntPtr IWindowService.GetForegroundWindow()
+    {
+        return GetForegroundWindow();
     }
 }
