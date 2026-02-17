@@ -61,11 +61,11 @@ public class MacOSHotkeyService : IHotkeyService
 
             if (isTrusted)
             {
-                Console.WriteLine("[macOS] ✓ Accessibility permissions already granted");
+                Console.WriteLine("[macOS] [OK] Accessibility permissions already granted");
             }
             else
             {
-                Console.WriteLine("[macOS] ✗ Accessibility permissions NOT granted");
+                Console.WriteLine("[macOS] [ERROR] Accessibility permissions NOT granted");
                 Console.WriteLine("[macOS] ");
                 Console.WriteLine("[macOS] HOTKEYS WILL NOT WORK without Accessibility permissions!");
                 Console.WriteLine("[macOS] ");
