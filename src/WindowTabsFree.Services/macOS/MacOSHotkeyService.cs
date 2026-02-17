@@ -18,6 +18,7 @@ public class MacOSHotkeyService : IHotkeyService
     private const uint kEventHotKeyReleased = 6;
     private const uint kEventClassKeyboard = 1801812322; // 'keyb'
     private const uint typeEventHotKeyID = 1751869540; // 'hkid'
+    private const uint kEventHotKeySignature = 1751346532; // 'htky'
 
     // Modifier keys
     private const uint cmdKey = 256;
@@ -57,7 +58,7 @@ public class MacOSHotkeyService : IHotkeyService
             _registeredCallbacks[id] = callback;
 
             // Try to register with Carbon (this may fail on modern macOS due to security restrictions)
-            var hotKeyID = new EventHotKeyID { signature = 1751346532, id = (uint)id }; // 'htky'
+            var hotKeyID = new EventHotKeyID { signature = kEventHotKeySignature, id = (uint)id };
             
             try
             {

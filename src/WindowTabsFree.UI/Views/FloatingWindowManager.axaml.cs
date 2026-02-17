@@ -16,9 +16,15 @@ namespace WindowTabsFree.UI.Views
         private readonly IConfigurationService _configService;
         private DispatcherTimer? _refreshTimer;
 
-        // Parameterless constructor for XAML (required but not used at runtime)
-        public FloatingWindowManager() : this(null!, null!, null!)
+        // Parameterless constructor for XAML designer support only
+        public FloatingWindowManager()
         {
+            InitializeComponent();
+            // Services will be null - this constructor is only for XAML designer
+            // At runtime, the parameterized constructor should always be used
+            _windowManager = null!;
+            _windowService = null!;
+            _configService = null!;
         }
 
         public FloatingWindowManager(WindowManagerService windowManager, IWindowService windowService, IConfigurationService configService)

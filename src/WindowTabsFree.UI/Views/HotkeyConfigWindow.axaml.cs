@@ -14,9 +14,13 @@ namespace WindowTabsFree.UI.Views
         private TextBox? _capturingTextBox;
         private readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
 
-        // Parameterless constructor for XAML (required but not used at runtime)
-        public HotkeyConfigWindow() : this(null!)
+        // Parameterless constructor for XAML designer support only
+        public HotkeyConfigWindow()
         {
+            InitializeComponent();
+            // Service will be null - this constructor is only for XAML designer
+            // At runtime, the parameterized constructor should always be used
+            _configService = null!;
         }
 
         public HotkeyConfigWindow(IConfigurationService configService)
