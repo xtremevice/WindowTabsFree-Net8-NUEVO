@@ -115,6 +115,14 @@ public class ConfigurationService : IConfigurationService
                 "Problem Reporter",
                 "ProblemReporter",
                 "Spotlight",
+                // Additional macOS system UI components
+                "ReportCrash",
+                "CrashReporter",
+                "UserNotificationCenter",
+                "NotificationCenterUI",
+                "com.apple.controlcenter",
+                "com.apple.notificationcenterui",
+                "com.apple.problemreporter",
                 
                 // Linux system processes
                 "gnome-shell",

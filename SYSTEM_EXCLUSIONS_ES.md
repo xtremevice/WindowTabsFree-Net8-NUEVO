@@ -31,13 +31,20 @@ Por defecto, WindowTabsFree excluye aplicaciones comunes del sistema y component
 | `Dock` | Dock de macOS |
 | `Control Center` / `ControlCenter` | Centro de Control de macOS |
 | `NotificationCenter` / `Notification Center` | Centro de Notificaciones de macOS |
+| `UserNotificationCenter` | Centro de Notificaciones de Usuario de macOS |
+| `NotificationCenterUI` | Interfaz del Centro de Notificaciones de macOS |
 | `SystemUIServer` | Servidor de UI del Sistema de macOS |
 | `WindowServer` | Servidor de Ventanas de macOS |
 | `loginwindow` | Ventana de Inicio de Sesión de macOS |
 | `CoreServicesUIAgent` | Agente de UI de Servicios Principales de macOS |
 | `UserEventAgent` | Agente de Eventos de Usuario de macOS |
 | `Problem Reporter` / `ProblemReporter` | Reportador de Problemas de macOS |
+| `ReportCrash` | Reportador de Fallos de macOS |
+| `CrashReporter` | Reportador de Fallos de macOS (nombre alternativo) |
 | `Spotlight` | Búsqueda Spotlight de macOS |
+| `com.apple.controlcenter` | Centro de Control de macOS (ID de paquete) |
+| `com.apple.notificationcenterui` | Interfaz del Centro de Notificaciones de macOS (ID de paquete) |
+| `com.apple.problemreporter` | Reportador de Problemas de macOS (ID de paquete) |
 
 ### Procesos del Sistema Linux
 
