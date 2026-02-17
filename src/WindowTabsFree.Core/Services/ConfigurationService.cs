@@ -147,6 +147,14 @@ public class ConfigurationService : IConfigurationService
                 "mate-panel",
                 "cinnamon"
             },
+            ExcludedApplicationPaths = new List<string>
+            {
+                // macOS system paths
+                "/System/Library/CoreServices/",
+                "/System/Library/PrivateFrameworks/",
+                "/System/Library/Frameworks/",
+                "/usr/libexec/"
+            },
             HotKeys = new HotKeysSettings
             {
                 ToggleManagerWindow = "Ctrl+Alt+T",

@@ -26,6 +26,11 @@ public class WindowInfo
     public string ProcessName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Process path (full path to the executable)
+    /// </summary>
+    public string ProcessPath { get; set; } = string.Empty;
+
+    /// <summary>
     /// Window class name
     /// </summary>
     public string ClassName { get; set; } = string.Empty;

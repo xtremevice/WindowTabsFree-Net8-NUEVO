@@ -34,6 +34,9 @@ namespace WindowTabsFree.UI.Views
             _windowService = windowService;
             _configService = configService;
             
+            // Set up drag functionality for the header
+            SetupDragBehavior();
+            
             // Set up refresh timer
             _refreshTimer = new DispatcherTimer
             {
@@ -44,6 +47,21 @@ namespace WindowTabsFree.UI.Views
             
             // Initial load
             RefreshGroups();
+        }
+
+        private void SetupDragBehavior()
+        {
+            var dragHeader = this.FindControl<Grid>("DragHeader");
+            if (dragHeader != null)
+            {
+                dragHeader.PointerPressed += (s, e) =>
+                {
+                    if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+                    {
+                        BeginMoveDrag(e);
+                    }
+                };
+            }
         }
 
         private void RefreshTimer_Tick(object? sender, EventArgs e)

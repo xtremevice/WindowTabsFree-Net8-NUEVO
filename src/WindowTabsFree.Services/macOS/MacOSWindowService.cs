@@ -45,6 +45,10 @@ public class MacOSWindowService : IWindowService, IDisposable
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
     private static extern bool CFBooleanGetValue(IntPtr boolean);
 
+    // libc - Process path
+    [DllImport("libc")]
+    private static extern int proc_pidpath(int pid, byte[] buffer, uint bufferSize);
+
     // AppKit - Application activation
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
     private static extern bool NSApplicationActivateIgnoringOtherApps(IntPtr app, bool flag);
@@ -188,6 +192,22 @@ public class MacOSWindowService : IWindowService, IDisposable
             {
                 CFNumberGetValue(ownerPIDValue, kCFNumberIntType, out int pid);
                 windowInfo.ProcessId = pid;
+                
+                // Get process path from PID
+                if (pid > 0)
+                {
+                    byte[] pathBuffer = new byte[4096];
+                    int ret = proc_pidpath(pid, pathBuffer, (uint)pathBuffer.Length);
+                    if (ret > 0)
+                    {
+                        int nullIndex = Array.IndexOf(pathBuffer, (byte)0);
+                        if (nullIndex > 0)
+                        {
+                            windowInfo.ProcessPath = System.Text.Encoding.UTF8.GetString(pathBuffer, 0, nullIndex);
+                            System.Diagnostics.Debug.WriteLine($"[macOS] Process path: '{windowInfo.ProcessPath}'");
+                        }
+                    }
+                }
             }
 
             // Get window layer

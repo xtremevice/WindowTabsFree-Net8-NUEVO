@@ -10,7 +10,7 @@
         Topmost="True"
         CanResize="False"
         SystemDecorations="None"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Background="#F5F5F5">
     
     <Grid Margin="2">
@@ -20,8 +20,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <!-- Header with Pin On Top Toggle (no "Windows" text) -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+        <!-- Draggable Header with Pin On Top Toggle -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,2" 
+              Name="DragHeader"
+              Background="#E0E0E0"
+              Cursor="Hand">
+            <TextBlock Grid.Column="0"
+                      Text="⋮⋮"
+                      FontSize="12"
+                      FontWeight="Bold"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center"
+                      Foreground="#757575"
+                      Margin="5,2"/>
             <ToggleButton Grid.Column="1" 
                          Name="PinOnTopToggle"
                          Content="📌" 

@@ -24,12 +24,26 @@ public class WindowManagerService
     {
         var allWindows = _windowService.GetAllWindows();
         var excludedApps = _configurationService.Settings.ExcludedApplications;
+        var excludedPaths = _configurationService.Settings.ExcludedApplicationPaths;
 
         // Include windows that have either a title OR a process name (but not both empty)
         // This allows detection of Terminal, Brave, GitHub Desktop, games, etc.
         return allWindows.Where(w => 
             (!string.IsNullOrWhiteSpace(w.Title) || !string.IsNullOrWhiteSpace(w.ProcessName)) &&
-            !excludedApps.Contains(w.ProcessName, StringComparer.OrdinalIgnoreCase));
+            !excludedApps.Contains(w.ProcessName, StringComparer.OrdinalIgnoreCase) &&
+            !IsPathExcluded(w.ProcessPath, excludedPaths));
+    }
+
+    /// <summary>
+    /// Checks if a process path matches any excluded path patterns
+    /// </summary>
+    private bool IsPathExcluded(string processPath, List<string> excludedPaths)
+    {
+        if (string.IsNullOrWhiteSpace(processPath) || excludedPaths == null || excludedPaths.Count == 0)
+            return false;
+
+        return excludedPaths.Any(excludedPath => 
+            processPath.StartsWith(excludedPath, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
