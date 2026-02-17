@@ -85,6 +85,8 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **[GUIA_AGRUPACION.md](GUIA_AGRUPACION.md)** - Auto-grouping and tab navigation (Spanish)
 - **[GUIA_USO_MEJORADA.md](GUIA_USO_MEJORADA.md)** - Enhanced features guide (Spanish)
 - **[AUTO_AGRUPACION_Y_TABS.md](AUTO_AGRUPACION_Y_TABS.md)** - Tab system documentation
+- **[SYSTEM_EXCLUSIONS.md](SYSTEM_EXCLUSIONS.md)** - 🚫 System application filtering guide
+- **[SYSTEM_EXCLUSIONS_ES.md](SYSTEM_EXCLUSIONS_ES.md)** - 🚫 Guía de filtrado de aplicaciones del sistema
 
 ### Platform-Specific
 - **[MACOS_GUIDE.md](MACOS_GUIDE.md)** - macOS setup and usage

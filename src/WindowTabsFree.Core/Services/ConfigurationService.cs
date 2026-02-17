@@ -86,7 +86,44 @@ public class ConfigurationService : IConfigurationService
             StartWithWindows = false,
             ShowInSystemTray = true,
             MinimizeToTray = true,
-            ExcludedApplications = new List<string>(),
+            ExcludedApplications = new List<string>
+            {
+                // Windows system processes
+                "explorer",
+                "taskmgr",
+                "dwm",
+                "SearchUI",
+                "SearchApp",
+                "ShellExperienceHost",
+                "ApplicationFrameHost",
+                "TextInputHost",
+                "LockApp",
+                "StartMenuExperienceHost",
+                "SystemSettings",
+                
+                // macOS system processes
+                "Dock",
+                "Control Center",
+                "ControlCenter",
+                "NotificationCenter",
+                "Notification Center",
+                "SystemUIServer",
+                "WindowServer",
+                "loginwindow",
+                "CoreServicesUIAgent",
+                "UserEventAgent",
+                "Problem Reporter",
+                "ProblemReporter",
+                "Spotlight",
+                
+                // Linux system processes
+                "gnome-shell",
+                "plasmashell",
+                "xfce4-panel",
+                "lxpanel",
+                "mate-panel",
+                "cinnamon"
+            },
             HotKeys = new HotKeysSettings
             {
                 ToggleManagerWindow = "Ctrl+Alt+T",
