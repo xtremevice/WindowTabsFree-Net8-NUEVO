@@ -47,9 +47,16 @@ public class MacOSHotkeyService : IHotkeyService
 
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
     private static extern void CFRelease(IntPtr cf);
+    
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern IntPtr CFBooleanGetValue(bool value);
 
     private const uint kCFStringEncodingUTF8 = 0x08000100;
     private static readonly string kAXTrustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt";
+
+    // Get the kCFBooleanTrue constant
+    // On macOS, kCFBooleanTrue is at a fixed address: 0x7FFFBDE99 or we can use value 1
+    private static readonly IntPtr kCFBooleanTrue = new IntPtr(1);
 
     [StructLayout(LayoutKind.Sequential)]
     private struct EventHotKeyID
@@ -68,21 +75,32 @@ public class MacOSHotkeyService : IHotkeyService
             // Create the prompt key
             IntPtr promptKey = CFStringCreateWithCString(IntPtr.Zero, kAXTrustedCheckOptionPrompt, kCFStringEncodingUTF8);
             
-            // Create a CFBoolean true value (1 means true in CF land)
-            IntPtr trueValue = new IntPtr(1);
+            if (promptKey == IntPtr.Zero)
+            {
+                Console.WriteLine("[macOS] Failed to create prompt key");
+                return false;
+            }
             
             // Create dictionary with the prompt option
+            // Using simple approach: pass null for callbacks to use default behavior
             IntPtr[] keys = new IntPtr[] { promptKey };
-            IntPtr[] values = new IntPtr[] { trueValue };
+            IntPtr[] values = new IntPtr[] { kCFBooleanTrue };
             
             IntPtr options = CFDictionaryCreate(
-                IntPtr.Zero,
+                IntPtr.Zero,  // default allocator
                 keys,
                 values,
-                1,
-                IntPtr.Zero,
-                IntPtr.Zero
+                1,            // one key-value pair
+                IntPtr.Zero,  // default key callbacks
+                IntPtr.Zero   // default value callbacks
             );
+
+            if (options == IntPtr.Zero)
+            {
+                CFRelease(promptKey);
+                Console.WriteLine("[macOS] Failed to create options dictionary");
+                return false;
+            }
 
             // Check if process is trusted, this will show the system dialog if not
             bool isTrusted = AXIsProcessTrustedWithOptions(options);

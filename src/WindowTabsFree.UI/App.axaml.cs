@@ -39,7 +39,13 @@ public partial class App : Application
             if (OperatingSystem.IsMacOS())
             {
                 Console.WriteLine("[macOS] Checking Accessibility permissions for hotkeys...");
-                WindowTabsFree.Services.macOS.MacOSHotkeyService.CheckAndRequestAccessibilityPermissions();
+                bool hasPermissions = WindowTabsFree.Services.macOS.MacOSHotkeyService.CheckAndRequestAccessibilityPermissions();
+                
+                if (!hasPermissions)
+                {
+                    Console.WriteLine("[macOS] WARNING: Hotkeys will not work without Accessibility permissions");
+                    Console.WriteLine("[macOS] Please grant permissions in System Settings and restart the app");
+                }
             }
             
             // Initialize services
