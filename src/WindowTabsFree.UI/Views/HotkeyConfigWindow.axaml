@@ -34,9 +34,11 @@
                        FontSize="12"/>
             <TextBox Grid.Column="1" 
                      Name="NextWindowTextBox"
-                     Watermark="e.g., Ctrl+Tab"
+                     Watermark="Click and press keys..."
                      FontSize="12"
-                     Padding="8,6"/>
+                     Padding="8,6"
+                     IsReadOnly="False"
+                     Cursor="Hand"/>
         </Grid>
         
         <!-- Previous Window Hotkey -->
@@ -47,9 +49,11 @@
                        FontSize="12"/>
             <TextBox Grid.Column="1" 
                      Name="PreviousWindowTextBox"
-                     Watermark="e.g., Ctrl+Shift+Tab"
+                     Watermark="Click and press keys..."
                      FontSize="12"
-                     Padding="8,6"/>
+                     Padding="8,6"
+                     IsReadOnly="False"
+                     Cursor="Hand"/>
         </Grid>
         
         <!-- Help Text -->
