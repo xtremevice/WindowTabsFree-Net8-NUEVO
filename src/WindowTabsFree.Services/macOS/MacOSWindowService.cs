@@ -201,10 +201,12 @@ public class MacOSWindowService : IWindowService, IDisposable
                     if (ret > 0)
                     {
                         int nullIndex = Array.IndexOf(pathBuffer, (byte)0);
-                        if (nullIndex > 0)
+                        if (nullIndex >= 0)
                         {
                             windowInfo.ProcessPath = System.Text.Encoding.UTF8.GetString(pathBuffer, 0, nullIndex);
+                            #if DEBUG
                             System.Diagnostics.Debug.WriteLine($"[macOS] Process path: '{windowInfo.ProcessPath}'");
+                            #endif
                         }
                     }
                 }
