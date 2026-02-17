@@ -17,7 +17,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
         <!-- Toolbar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Spacing="10">
             <Button Content="🔄 Refresh Now" Click="RefreshButton_Click"/>
@@ -29,8 +29,31 @@
                       Foreground="Gray" FontSize="12" FontStyle="Italic" Margin="10,0,0,0"/>
         </StackPanel>
 
+        <!-- Hotkey Configuration Section -->
+        <Border Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" 
+                Background="#F0F8FF" Padding="10" Margin="10,0,10,5">
+            <Grid ColumnDefinitions="Auto,200,Auto,200,Auto">
+                <TextBlock Grid.Column="0" Text="⌨️ Next Window:" 
+                          VerticalAlignment="Center" FontSize="12" Margin="0,0,10,0"/>
+                <TextBox Grid.Column="1" Name="NextWindowHotkeyTextBox"
+                        Watermark="Click and press keys..."
+                        FontSize="11" Padding="6,4" Margin="0,0,10,0"/>
+                
+                <TextBlock Grid.Column="2" Text="Previous Window:" 
+                          VerticalAlignment="Center" FontSize="12" Margin="0,0,10,0"/>
+                <TextBox Grid.Column="3" Name="PreviousWindowHotkeyTextBox"
+                        Watermark="Click and press keys..."
+                        FontSize="11" Padding="6,4" Margin="0,0,10,0"/>
+                
+                <Button Grid.Column="4" Content="💾 Save Hotkeys" 
+                       Click="SaveHotkeysButton_Click"
+                       Background="#4CAF50" Foreground="White"
+                       Padding="10,5" FontSize="11"/>
+            </Grid>
+        </Border>
+
         <!-- Main Content -->
-        <Grid Grid.Row="1" ColumnDefinitions="300,*" Margin="10">
+        <Grid Grid.Row="2" ColumnDefinitions="300,*" Margin="10">
             <!-- Left Panel - Tab Groups -->
             <Border Grid.Column="0" BorderBrush="LightGray" BorderThickness="1" 
                    Padding="10" Margin="0,0,10,0">

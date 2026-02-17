@@ -86,19 +86,14 @@ namespace WindowTabsFree.UI.Views
 
             e.Handled = true;
 
-            // When keys are released, finalize the combination if we have at least one key
+            // When keys are released, just remove the key from pressed keys
             if (_pressedKeys.Count > 0)
             {
                 // Remove the released key
                 _pressedKeys.Remove(e.Key);
-
-                // If all keys are released and we had captured something, finalize
-                if (_pressedKeys.Count == 0 && !string.IsNullOrWhiteSpace(_capturingTextBox.Text))
-                {
-                    // Move focus away to finalize the capture
-                    var otherTextBox = _capturingTextBox == NextWindowTextBox ? PreviousWindowTextBox : NextWindowTextBox;
-                    otherTextBox?.Focus();
-                }
+                
+                // Don't auto-advance to next field - let user decide when they're done
+                // User can click on another field or use Tab key to move
             }
         }
 

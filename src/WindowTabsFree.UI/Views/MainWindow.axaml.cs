@@ -1,16 +1,197 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using WindowTabsFree.Common.Models;
 using WindowTabsFree.UI.ViewModels;
+using WindowTabsFree.Core.Services;
 
 namespace WindowTabsFree.UI.Views;
 
 public partial class MainWindow : Window
 {
+    private TextBox? _capturingTextBox;
+    private readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
+    private ConfigurationService? _configService;
+
     public MainWindow()
     {
         InitializeComponent();
+        _configService = new ConfigurationService();
+        LoadHotkeySettings();
+        AttachHotkeyEvents();
+    }
+
+    private void LoadHotkeySettings()
+    {
+        if (_configService == null) return;
+        
+        var settings = _configService.Settings;
+        if (settings.HotKeys != null)
+        {
+            NextWindowHotkeyTextBox.Text = settings.HotKeys.NextWindow ?? "";
+            PreviousWindowHotkeyTextBox.Text = settings.HotKeys.PreviousWindow ?? "";
+        }
+    }
+
+    private void AttachHotkeyEvents()
+    {
+        // Attach events to both textboxes
+        NextWindowHotkeyTextBox.GotFocus += OnHotkeyTextBoxGotFocus;
+        NextWindowHotkeyTextBox.LostFocus += OnHotkeyTextBoxLostFocus;
+        NextWindowHotkeyTextBox.KeyDown += OnHotkeyTextBoxKeyDown;
+        NextWindowHotkeyTextBox.KeyUp += OnHotkeyTextBoxKeyUp;
+        
+        PreviousWindowHotkeyTextBox.GotFocus += OnHotkeyTextBoxGotFocus;
+        PreviousWindowHotkeyTextBox.LostFocus += OnHotkeyTextBoxLostFocus;
+        PreviousWindowHotkeyTextBox.KeyDown += OnHotkeyTextBoxKeyDown;
+        PreviousWindowHotkeyTextBox.KeyUp += OnHotkeyTextBoxKeyUp;
+    }
+
+    private void OnHotkeyTextBoxGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            _capturingTextBox = textBox;
+            _pressedKeys.Clear();
+            textBox.Text = "";
+            textBox.Watermark = "Press keys now...";
+        }
+    }
+
+    private void OnHotkeyTextBoxLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            _capturingTextBox = null;
+            _pressedKeys.Clear();
+            
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBox.Watermark = "Click and press keys...";
+            }
+        }
+    }
+
+    private void OnHotkeyTextBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (_capturingTextBox == null || sender != _capturingTextBox)
+            return;
+
+        e.Handled = true;
+        _pressedKeys.Add(e.Key);
+        UpdateHotkeyText();
+    }
+
+    private void OnHotkeyTextBoxKeyUp(object? sender, KeyEventArgs e)
+    {
+        if (_capturingTextBox == null)
+            return;
+
+        e.Handled = true;
+
+        if (_pressedKeys.Count > 0)
+        {
+            _pressedKeys.Remove(e.Key);
+        }
+    }
+
+    private void UpdateHotkeyText()
+    {
+        if (_capturingTextBox == null || _pressedKeys.Count == 0)
+            return;
+
+        var modifiers = new List<string>();
+        var regularKeys = new List<string>();
+
+        foreach (var key in _pressedKeys.OrderBy(k => GetKeyPriority(k)))
+        {
+            string keyName = GetKeyName(key);
+            
+            if (IsModifierKey(key))
+            {
+                if (!modifiers.Contains(keyName))
+                    modifiers.Add(keyName);
+            }
+            else
+            {
+                if (!regularKeys.Contains(keyName))
+                    regularKeys.Add(keyName);
+            }
+        }
+
+        var hotkeyParts = new List<string>();
+        hotkeyParts.AddRange(modifiers);
+        hotkeyParts.AddRange(regularKeys);
+
+        _capturingTextBox.Text = string.Join("+", hotkeyParts);
+    }
+
+    private bool IsModifierKey(Key key)
+    {
+        return key == Key.LeftCtrl || key == Key.RightCtrl ||
+               key == Key.LeftAlt || key == Key.RightAlt ||
+               key == Key.LeftShift || key == Key.RightShift ||
+               key == Key.LWin || key == Key.RWin;
+    }
+
+    private int GetKeyPriority(Key key)
+    {
+        if (key == Key.LeftCtrl || key == Key.RightCtrl) return 0;
+        if (key == Key.LeftAlt || key == Key.RightAlt) return 1;
+        if (key == Key.LeftShift || key == Key.RightShift) return 2;
+        if (key == Key.LWin || key == Key.RWin) return 3;
+        return 4;
+    }
+
+    private string GetKeyName(Key key)
+    {
+        return key switch
+        {
+            Key.LeftCtrl or Key.RightCtrl => "Ctrl",
+            Key.LeftAlt or Key.RightAlt => "Alt",
+            Key.LeftShift or Key.RightShift => "Shift",
+            Key.LWin or Key.RWin => "Win",
+            Key.Left => "Left",
+            Key.Right => "Right",
+            Key.Up => "Up",
+            Key.Down => "Down",
+            _ => key.ToString()
+        };
+    }
+
+    private void SaveHotkeysButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_configService == null) return;
+        
+        var settings = _configService.Settings;
+        if (settings.HotKeys == null)
+        {
+            settings.HotKeys = new HotKeysSettings();
+        }
+        
+        settings.HotKeys.NextWindow = NextWindowHotkeyTextBox.Text?.Trim();
+        settings.HotKeys.PreviousWindow = PreviousWindowHotkeyTextBox.Text?.Trim();
+        
+        _configService.SaveSettings(settings);
+        
+        // Show success message
+        var messageBox = new Window
+        {
+            Title = "Success",
+            Width = 300,
+            Height = 120,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+        var panel = new StackPanel { Margin = new Avalonia.Thickness(20) };
+        panel.Children.Add(new TextBlock { Text = "✓ Hotkeys saved successfully!", FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 15) });
+        var okButton = new Button { Content = "OK", Width = 80, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
+        okButton.Click += (s, args) => messageBox.Close();
+        panel.Children.Add(okButton);
+        messageBox.Content = panel;
+        messageBox.ShowDialog(this);
     }
 
     protected override void OnClosed(EventArgs e)

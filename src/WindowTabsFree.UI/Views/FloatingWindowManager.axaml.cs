@@ -101,12 +101,6 @@ namespace WindowTabsFree.UI.Views
             }
         }
 
-        private async void ConfigureHotkeys_Click(object? sender, RoutedEventArgs e)
-        {
-            var hotkeyWindow = new HotkeyConfigWindow(_configService);
-            await hotkeyWindow.ShowDialog(this);
-        }
-
         private void CloseWindow_Click(object? sender, RoutedEventArgs e)
         {
             Close();
