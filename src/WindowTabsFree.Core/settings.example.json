@@ -16,6 +16,8 @@
   "HotKeys": {
     "ToggleManagerWindow": "Ctrl+Alt+T",
     "NextTab": "Ctrl+Tab",
-    "PreviousTab": "Ctrl+Shift+Tab"
+    "PreviousTab": "Ctrl+Shift+Tab",
+    "NextWindow": "Ctrl+Alt+Right",
+    "PreviousWindow": "Ctrl+Alt+Left"
   }
 }
