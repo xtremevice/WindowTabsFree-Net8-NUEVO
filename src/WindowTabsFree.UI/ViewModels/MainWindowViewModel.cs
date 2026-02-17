@@ -108,6 +108,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         try
         {
             RefreshWindows();
+            RefreshTabGroups(); // Also refresh tab groups to update window titles
         }
         catch (Exception ex)
         {
@@ -159,7 +160,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             }
         }
         
-        TabGroups = new ObservableCollection<TabGroup>(groups);
+        // Update on UI thread to ensure window titles are refreshed in real-time
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            TabGroups = new ObservableCollection<TabGroup>(groups);
+        });
     }
 
     public void FocusWindow(WindowInfo window)
