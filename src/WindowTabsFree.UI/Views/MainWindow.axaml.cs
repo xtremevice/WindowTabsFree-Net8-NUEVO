@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using System;
 using WindowTabsFree.Common.Models;
 using WindowTabsFree.UI.ViewModels;
 
@@ -216,7 +217,7 @@ public partial class MainWindow : Window
                 var configService = new WindowTabsFree.Core.Services.ConfigurationService();
                 var windowManager = new WindowTabsFree.Core.Services.WindowManagerService(windowService, configService);
                 
-                _floatingWindow = new FloatingWindowManager(windowManager, windowService);
+                _floatingWindow = new FloatingWindowManager(windowManager, windowService, configService);
                 _floatingWindow.Show();
                 
                 // Minimize main window

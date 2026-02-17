@@ -2,6 +2,20 @@
 
 Esta guía te muestra cómo ejecutar WindowTabsFree directamente desde tu terminal.
 
+## 📥 ¿Necesitas descargar el proyecto primero?
+
+**Si aún no tienes el proyecto descargado**, consulta la guía completa de descarga:
+- **[COMO_DESCARGAR_Y_EJECUTAR.md](COMO_DESCARGAR_Y_EJECUTAR.md)** ⭐
+
+Comandos rápidos:
+```bash
+# Clonar desde GitHub
+git clone https://github.com/xtremevice/WindowTabsFree-Net8-NUEVO.git
+cd WindowTabsFree-Net8-NUEVO
+```
+
+---
+
 ## ⚠️ IMPORTANTE: Debes estar en el directorio del proyecto
 
 Todos los comandos asumen que estás en el directorio `WindowTabsFree`. Verifica primero:

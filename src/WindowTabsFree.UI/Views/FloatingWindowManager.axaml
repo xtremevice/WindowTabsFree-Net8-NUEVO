@@ -3,188 +3,107 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="using:WindowTabsFree.Common.Models"
-        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="400"
         x:Class="WindowTabsFree.UI.Views.FloatingWindowManager"
         Title="Window Manager (Floating)"
-        Width="450" Height="600"
+        Width="300" Height="400"
         Topmost="True"
         CanResize="True"
         WindowStartupLocation="CenterScreen">
     
-    <Grid Margin="10">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <!-- Header with Pin On Top Toggle -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,5">
             <TextBlock Grid.Column="0" 
-                       Text="Tab Groups" 
-                       FontSize="16" 
+                       Text="Windows" 
+                       FontSize="12" 
                        FontWeight="Bold"
                        VerticalAlignment="Center"/>
             <ToggleButton Grid.Column="1" 
                          Name="PinOnTopToggle"
-                         Content="📌 Pin On Top" 
+                         Content="📌" 
                          Click="PinOnTopToggle_Click"
                          IsChecked="True"
-                         Padding="8,4"/>
+                         Padding="4,2"
+                         FontSize="10"/>
         </Grid>
         
-        <!-- Groups List with Full Tab Information -->
+        <!-- Simplified Windows List - Just Buttons with Titles -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl Name="GroupsItemsControl">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="models:TabGroup">
-                        <Border BorderBrush="LightGray" BorderThickness="1" 
-                               Padding="10" Margin="0,5,0,5" 
-                               Background="{Binding Color, FallbackValue=White}">
-                            <StackPanel>
-                                <!-- Group Header -->
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
-                                        <TextBlock Text="{Binding ApplicationName, StringFormat='App: {0}'}" 
-                                                  FontSize="11" Foreground="Gray"
-                                                  IsVisible="{Binding IsAutoGrouped}"/>
-                                        <TextBlock Text="{Binding WindowHandles.Count, StringFormat='Windows: {0}'}" 
-                                                  FontSize="11" Foreground="Gray"/>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Content="×" Click="DeleteTabGroupButton_Click" 
-                                           Tag="{Binding}" FontSize="18" Width="30" Height="30"
-                                           Background="#FFCDD2"/>
-                                </Grid>
-                                
-                                <!-- Tab Navigation Buttons -->
-                                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,10,0,5">
-                                    <Button Content="◄ Prev Tab" Click="PrevTab_Click" 
-                                           Tag="{Binding}" Width="100" FontSize="11"
-                                           IsEnabled="{Binding WindowHandles.Count}"/>
-                                    <Button Content="Next Tab ►" Click="NextTab_Click" 
-                                           Tag="{Binding}" Width="100" FontSize="11"
-                                           IsEnabled="{Binding WindowHandles.Count}"/>
-                                </StackPanel>
-                                
-                                <!-- Active Tab Info -->
-                                <Border BorderBrush="#4CAF50" BorderThickness="2" 
-                                       Padding="5" Margin="0,5,0,0"
-                                       Background="#E8F5E9"
-                                       IsVisible="{Binding WindowHandles.Count}">
-                                    <StackPanel>
-                                        <TextBlock Text="Active Tab:" FontSize="10" 
-                                                  Foreground="Gray" FontWeight="Bold"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <TextBlock Text="Tab" FontSize="11"/>
-                                            <TextBlock Text="{Binding ActiveWindowIndex}" 
-                                                      FontSize="11" FontWeight="Bold"/>
-                                            <TextBlock Text="of" FontSize="11"/>
-                                            <TextBlock Text="{Binding WindowHandles.Count}" 
-                                                      FontSize="11" FontWeight="Bold"/>
+                        <StackPanel Margin="0,2">
+                            <!-- Simple buttons for each window showing only title -->
+                            <ItemsControl ItemsSource="{Binding WindowsInfo}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="models:WindowInfo">
+                                        <StackPanel>
+                                            <!-- Active window button (green) -->
+                                            <Button Click="FocusThisTab_Click"
+                                                   Tag="{Binding}"
+                                                   HorizontalAlignment="Stretch"
+                                                   HorizontalContentAlignment="Left"
+                                                   Margin="0,2"
+                                                   Padding="8,6"
+                                                   Height="35"
+                                                   Background="#C8E6C9"
+                                                   IsVisible="{Binding IsActiveInGroup}">
+                                                <TextBlock Text="{Binding DisplayTitle}" 
+                                                          FontSize="11" 
+                                                          TextWrapping="NoWrap"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          FontWeight="Bold"/>
+                                            </Button>
+                                            <!-- Inactive window button (white) -->
+                                            <Button Click="FocusThisTab_Click"
+                                                   Tag="{Binding}"
+                                                   HorizontalAlignment="Stretch"
+                                                   HorizontalContentAlignment="Left"
+                                                   Margin="0,2"
+                                                   Padding="8,6"
+                                                   Height="35"
+                                                   Background="White"
+                                                   IsVisible="{Binding IsInactive}">
+                                                <TextBlock Text="{Binding DisplayTitle}" 
+                                                          FontSize="11" 
+                                                          TextWrapping="NoWrap"
+                                                          TextTrimming="CharacterEllipsis"/>
+                                            </Button>
                                         </StackPanel>
-                                    </StackPanel>
-                                </Border>
-                                
-                                <!-- Tabs/Windows in Group -->
-                                <Border BorderBrush="LightGray" BorderThickness="1" 
-                                       Padding="5" Margin="0,10,0,0"
-                                       Background="#FAFAFA"
-                                       IsVisible="{Binding WindowsInfo.Count}">
-                                    <StackPanel>
-                                        <TextBlock Text="Tabs:" FontSize="10" 
-                                                  Foreground="Gray" FontWeight="Bold" 
-                                                  Margin="0,0,0,5"/>
-                                        <ItemsControl ItemsSource="{Binding WindowsInfo}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate DataType="models:WindowInfo">
-                                                    <StackPanel>
-                                                        <!-- Active Tab (Green highlight) -->
-                                                        <Border BorderBrush="#4CAF50" 
-                                                               BorderThickness="3" 
-                                                               Padding="8" 
-                                                               Margin="0,3,0,3"
-                                                               CornerRadius="4"
-                                                               Background="#C8E6C9"
-                                                               IsVisible="{Binding IsActiveInGroup}">
-                                                            <StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                                                    <TextBlock Text="✓" FontSize="14" Foreground="#2E7D32"/>
-                                                                    <TextBlock Text="{Binding DisplayTitle}" 
-                                                                              FontSize="11" 
-                                                                              FontWeight="Bold"
-                                                                              TextWrapping="Wrap"
-                                                                              MaxWidth="320"/>
-                                                                </StackPanel>
-                                                                <TextBlock Text="{Binding ProcessName, StringFormat='App: {0}'}" 
-                                                                          FontSize="9" 
-                                                                          Foreground="Gray"
-                                                                          Margin="20,2,0,0"/>
-                                                                <TextBlock Text="[ACTIVE TAB]" 
-                                                                          FontSize="9" 
-                                                                          FontWeight="Bold"
-                                                                          Foreground="#2E7D32"
-                                                                          Margin="20,2,0,5"/>
-                                                                <Button Content="Focus This Tab" 
-                                                                       Click="FocusThisTab_Click"
-                                                                       Tag="{Binding}"
-                                                                       FontSize="10"
-                                                                       Height="24"
-                                                                       Margin="20,0,0,0"
-                                                                       Background="#81C784"/>
-                                                            </StackPanel>
-                                                        </Border>
-                                                        
-                                                        <!-- Inactive Tab (Blue/White) -->
-                                                        <Border BorderBrush="#2196F3" 
-                                                               BorderThickness="2" 
-                                                               Padding="8" 
-                                                               Margin="0,3,0,3"
-                                                               CornerRadius="4"
-                                                               Background="White"
-                                                               IsVisible="{Binding !IsActiveInGroup}">
-                                                            <StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                                                    <TextBlock Text="📄" FontSize="14"/>
-                                                                    <TextBlock Text="{Binding DisplayTitle}" 
-                                                                              FontSize="11" 
-                                                                              TextWrapping="Wrap"
-                                                                              MaxWidth="320"/>
-                                                                </StackPanel>
-                                                                <TextBlock Text="{Binding ProcessName, StringFormat='App: {0}'}" 
-                                                                          FontSize="9" 
-                                                                          Foreground="Gray"
-                                                                          Margin="20,2,0,0"/>
-                                                                <Button Content="Focus This Tab" 
-                                                                       Click="FocusThisTab_Click"
-                                                                       Tag="{Binding}"
-                                                                       FontSize="10"
-                                                                       Height="24"
-                                                                       Margin="20,5,0,0"
-                                                                       Background="#E3F2FD"/>
-                                                            </StackPanel>
-                                                        </Border>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
         
-        <!-- Close Button -->
+        <!-- Hotkey Configuration Button -->
         <Button Grid.Row="2" 
-                Content="Close Window" 
+                Content="⚙️ Configure Hotkeys" 
+                Click="ConfigureHotkeys_Click"
+                HorizontalAlignment="Stretch"
+                Margin="0,5,0,5"
+                Padding="8,4"
+                FontSize="10"
+                Background="#E3F2FD"/>
+        
+        <!-- Close Button -->
+        <Button Grid.Row="3" 
+                Content="Close" 
                 Click="CloseWindow_Click"
                 HorizontalAlignment="Stretch"
-                Margin="0,10,0,0"
-                Padding="10"
-                Background="#FF5722"
-                Foreground="White"/>
+                Padding="8,4"
+                FontSize="10"
+                Background="#FFCDD2"/>
     </Grid>
 </Window>

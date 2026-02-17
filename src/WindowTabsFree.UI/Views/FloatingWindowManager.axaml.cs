@@ -13,13 +13,15 @@ namespace WindowTabsFree.UI.Views
     {
         private readonly WindowManagerService _windowManager;
         private readonly IWindowService _windowService;
+        private readonly IConfigurationService _configService;
         private DispatcherTimer? _refreshTimer;
 
-        public FloatingWindowManager(WindowManagerService windowManager, IWindowService windowService)
+        public FloatingWindowManager(WindowManagerService windowManager, IWindowService windowService, IConfigurationService configService)
         {
             InitializeComponent();
             _windowManager = windowManager;
             _windowService = windowService;
+            _configService = configService;
             
             // Set up refresh timer
             _refreshTimer = new DispatcherTimer
@@ -83,38 +85,11 @@ namespace WindowTabsFree.UI.Views
             }
         }
 
-        private void PrevTab_Click(object? sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is TabGroup group)
-            {
-                _windowManager.ActivatePreviousWindowInGroup(group.Id);
-                RefreshGroups();
-            }
-        }
-
-        private void NextTab_Click(object? sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is TabGroup group)
-            {
-                _windowManager.ActivateNextWindowInGroup(group.Id);
-                RefreshGroups();
-            }
-        }
-
         private void FocusThisTab_Click(object? sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is WindowInfo windowInfo)
             {
                 _windowService.SetFocus(windowInfo.Handle);
-            }
-        }
-
-        private void DeleteTabGroupButton_Click(object? sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is TabGroup group)
-            {
-                _windowManager.DeleteTabGroup(group.Id);
-                RefreshGroups();
             }
         }
 
@@ -124,6 +99,12 @@ namespace WindowTabsFree.UI.Views
             {
                 Topmost = toggle.IsChecked ?? true;
             }
+        }
+
+        private async void ConfigureHotkeys_Click(object? sender, RoutedEventArgs e)
+        {
+            var hotkeyWindow = new HotkeyConfigWindow(_configService);
+            await hotkeyWindow.ShowDialog(this);
         }
 
         private void CloseWindow_Click(object? sender, RoutedEventArgs e)

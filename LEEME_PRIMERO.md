@@ -13,6 +13,8 @@ cd WindowTabsFree-Net8
 dotnet run --project src/WindowTabsFree.UI/WindowTabsFree.UI.csproj
 ```
 
+**📥 ¿Necesitas descargar el proyecto primero?** Lee: [COMO_DESCARGAR_Y_EJECUTAR.md](COMO_DESCARGAR_Y_EJECUTAR.md)
+
 ---
 
 ## 📖 ¿Qué Leer Primero?
@@ -94,6 +96,8 @@ WindowTabsFree-Net8/
 **Lee según tu necesidad:**
 
 **Inicio Rápido:**
+- **COMO_DESCARGAR_Y_EJECUTAR.md** ⭐ **(NUEVO - Empieza aquí)**
+- **COMANDOS_RAPIDOS.md** 📌 **(Tarjeta de referencia)**
 - LEEME_PRIMERO.md (este archivo)
 - QUICKSTART_ES.md
 - QUICKSTART.md
