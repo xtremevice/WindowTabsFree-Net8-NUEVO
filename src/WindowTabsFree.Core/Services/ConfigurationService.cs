@@ -129,8 +129,8 @@ public class ConfigurationService : IConfigurationService
                 "NotificationCenterUI",
                 "notificationcenterui",
                 "controlcenter",
-                "Control center",
-                "Notification center",
+                "control center",
+                "notification center",
                 
                 // Linux system processes
                 "gnome-shell",
