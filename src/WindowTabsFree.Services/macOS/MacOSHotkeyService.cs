@@ -48,15 +48,53 @@ public class MacOSHotkeyService : IHotkeyService
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
     private static extern void CFRelease(IntPtr cf);
     
+    // Get the kCFBooleanTrue constant - this is a global constant in CoreFoundation
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
-    private static extern IntPtr CFBooleanGetValue(bool value);
+    private static extern IntPtr CFBooleanGetValue(IntPtr boolean);
 
     private const uint kCFStringEncodingUTF8 = 0x08000100;
     private static readonly string kAXTrustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt";
 
-    // Get the kCFBooleanTrue constant
-    // On macOS, kCFBooleanTrue is at a fixed address: 0x7FFFBDE99 or we can use value 1
-    private static readonly IntPtr kCFBooleanTrue = new IntPtr(1);
+    // Lazy-loaded kCFBooleanTrue constant
+    private static IntPtr? _cfBooleanTrue = null;
+    private static IntPtr GetCFBooleanTrue()
+    {
+        if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
+        {
+            // Get the address of kCFBooleanTrue from the framework
+            // It's exported as a symbol, we need to use dlsym to get it
+            IntPtr handle = dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", RTLD_NOW);
+            if (handle != IntPtr.Zero)
+            {
+                IntPtr symbolAddr = dlsym(handle, "kCFBooleanTrue");
+                if (symbolAddr != IntPtr.Zero)
+                {
+                    // Dereference the pointer to get the actual kCFBooleanTrue value
+                    _cfBooleanTrue = Marshal.ReadIntPtr(symbolAddr);
+                }
+                dlclose(handle);
+            }
+            
+            // If we still couldn't get it, set to Zero
+            if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
+            {
+                _cfBooleanTrue = IntPtr.Zero;
+            }
+        }
+        return _cfBooleanTrue.Value;
+    }
+
+    // Dynamic library loading functions
+    [DllImport("libdl")]
+    private static extern IntPtr dlopen(string filename, int flags);
+    
+    [DllImport("libdl")]
+    private static extern IntPtr dlsym(IntPtr handle, string symbol);
+    
+    [DllImport("libdl")]
+    private static extern int dlclose(IntPtr handle);
+    
+    private const int RTLD_NOW = 2;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct EventHotKeyID
@@ -72,6 +110,17 @@ public class MacOSHotkeyService : IHotkeyService
     {
         try
         {
+            // Get kCFBooleanTrue constant
+            IntPtr cfTrue = GetCFBooleanTrue();
+            if (cfTrue == IntPtr.Zero)
+            {
+                Console.WriteLine("[macOS] Failed to get kCFBooleanTrue constant");
+                Console.WriteLine("[macOS] Will check permissions without prompt option");
+                
+                // Fall back to checking without prompting
+                return AXIsProcessTrustedWithOptions(IntPtr.Zero);
+            }
+            
             // Create the prompt key
             IntPtr promptKey = CFStringCreateWithCString(IntPtr.Zero, kAXTrustedCheckOptionPrompt, kCFStringEncodingUTF8);
             
@@ -82,9 +131,8 @@ public class MacOSHotkeyService : IHotkeyService
             }
             
             // Create dictionary with the prompt option
-            // Using simple approach: pass null for callbacks to use default behavior
             IntPtr[] keys = new IntPtr[] { promptKey };
-            IntPtr[] values = new IntPtr[] { kCFBooleanTrue };
+            IntPtr[] values = new IntPtr[] { cfTrue };
             
             IntPtr options = CFDictionaryCreate(
                 IntPtr.Zero,  // default allocator
@@ -124,6 +172,7 @@ public class MacOSHotkeyService : IHotkeyService
         catch (Exception ex)
         {
             Console.WriteLine($"[macOS] Error checking Accessibility permissions: {ex.Message}");
+            Console.WriteLine($"[macOS] Stack trace: {ex.StackTrace}");
             return false;
         }
     }
