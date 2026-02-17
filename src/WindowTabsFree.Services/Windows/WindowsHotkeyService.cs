@@ -170,7 +170,8 @@ public class WindowsHotkeyService : IHotkeyService
     {
         lock (_lock)
         {
-            var ids = _registeredHotkeys.Keys.ToArray();
+            // Create a copy of keys to avoid collection modification during iteration
+            var ids = new List<int>(_registeredHotkeys.Keys);
             foreach (var id in ids)
             {
                 UnregisterHotkey(id);

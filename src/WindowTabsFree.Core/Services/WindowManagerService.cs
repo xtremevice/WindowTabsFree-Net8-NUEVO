@@ -410,7 +410,7 @@ public class WindowManagerService
         var currentWindow = _windowService.GetForegroundWindow();
         var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
         
-        // If current window is not in the list or is the last one, go to first
+        // Move to next window. If current window is not in list (currentIndex = -1) or is last, wrap to first
         var nextIndex = (currentIndex + 1) % windows.Count;
         
         _windowService.SetFocus(windows[nextIndex].Handle);
@@ -428,7 +428,7 @@ public class WindowManagerService
         var currentWindow = _windowService.GetForegroundWindow();
         var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
         
-        // If current window is not in the list or is the first one, go to last
+        // Move to previous window. If current window is not in list (currentIndex = -1), wrap to last
         var prevIndex = currentIndex <= 0 ? windows.Count - 1 : currentIndex - 1;
         
         _windowService.SetFocus(windows[prevIndex].Handle);
