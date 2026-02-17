@@ -81,8 +81,12 @@ public partial class MainWindow : Window
             return;
 
         e.Handled = true;
-        _pressedKeys.Add(e.Key);
-        UpdateHotkeyText();
+        
+        // Only add if not already in set to avoid unnecessary updates
+        if (_pressedKeys.Add(e.Key))
+        {
+            UpdateHotkeyText();
+        }
     }
 
     private void OnHotkeyTextBoxKeyUp(object? sender, KeyEventArgs e)
@@ -172,8 +176,11 @@ public partial class MainWindow : Window
             settings.HotKeys = new HotKeysSettings();
         }
         
-        settings.HotKeys.NextWindow = NextWindowHotkeyTextBox.Text?.Trim();
-        settings.HotKeys.PreviousWindow = PreviousWindowHotkeyTextBox.Text?.Trim();
+        // Validate and save hotkeys (empty values allowed - means no hotkey set)
+        settings.HotKeys.NextWindow = string.IsNullOrWhiteSpace(NextWindowHotkeyTextBox.Text) 
+            ? null : NextWindowHotkeyTextBox.Text.Trim();
+        settings.HotKeys.PreviousWindow = string.IsNullOrWhiteSpace(PreviousWindowHotkeyTextBox.Text) 
+            ? null : PreviousWindowHotkeyTextBox.Text.Trim();
         
         _configService.SaveSettings(settings);
         
