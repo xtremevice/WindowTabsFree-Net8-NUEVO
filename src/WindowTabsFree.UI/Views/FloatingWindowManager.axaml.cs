@@ -57,6 +57,9 @@ namespace WindowTabsFree.UI.Views
             {
                 var groups = _windowManager.GetTabGroups().ToList();
                 
+                // Get the currently focused window to properly mark it
+                var foregroundWindow = _windowService.GetForegroundWindow();
+                
                 // Populate WindowsInfo for each group
                 foreach (var group in groups)
                 {
@@ -76,12 +79,13 @@ namespace WindowTabsFree.UI.Views
                         .Where(w => w != null)
                         .ToList();
                     
-                    // Mark active window in group
+                    // Mark active window based on actual foreground window
                     for (int i = 0; i < windows.Count; i++)
                     {
                         if (windows[i] != null)
                         {
-                            windows[i]!.IsActiveInGroup = (i == group.ActiveWindowIndex);
+                            // Check if this is the currently focused window system-wide
+                            windows[i]!.IsActiveInGroup = (windows[i]!.Handle == foregroundWindow);
                         }
                     }
                     
@@ -101,6 +105,9 @@ namespace WindowTabsFree.UI.Views
             if (sender is Button button && button.Tag is WindowInfo windowInfo)
             {
                 _windowService.SetFocus(windowInfo.Handle);
+                
+                // Refresh immediately to update visual feedback
+                RefreshGroups();
             }
         }
 
