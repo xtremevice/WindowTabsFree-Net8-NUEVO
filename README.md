@@ -92,6 +92,7 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **[MACOS_GUIDE.md](MACOS_GUIDE.md)** - macOS setup and usage
 - **[GUIA_MAC_APPLE_SILICON.md](GUIA_MAC_APPLE_SILICON.md)** - Mac M1/M2/M3 guide (Spanish)
 - **[MACOS_DETECCION_FIX.md](MACOS_DETECCION_FIX.md)** - macOS window detection fixes
+- **[MACOS_SYSTEM_APPS_FIX.md](MACOS_SYSTEM_APPS_FIX.md)** - 🔧 Fix for macOS system apps still appearing
 
 ### Technical
 - **[LIMITACION_TABS_OVERLAY.md](LIMITACION_TABS_OVERLAY.md)** - Tab overlay limitations explained
