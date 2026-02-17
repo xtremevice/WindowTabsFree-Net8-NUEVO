@@ -123,6 +123,14 @@ public class ConfigurationService : IConfigurationService
                 "com.apple.controlcenter",
                 "com.apple.notificationcenterui",
                 "com.apple.problemreporter",
+                // More macOS variants
+                "NC",
+                "NCBulletinBoard",
+                "NotificationCenterUI",
+                "notificationcenterui",
+                "controlcenter",
+                "Control center",
+                "Notification center",
                 
                 // Linux system processes
                 "gnome-shell",

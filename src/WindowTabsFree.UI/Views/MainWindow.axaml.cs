@@ -184,6 +184,12 @@ public partial class MainWindow : Window
         
         _configService.SaveSettings(settings);
         
+        // Re-register hotkeys with new values
+        if (App.Current != null)
+        {
+            App.Current.ReRegisterHotkeys();
+        }
+        
         // Show success message
         var messageBox = new Window
         {
@@ -193,7 +199,7 @@ public partial class MainWindow : Window
             WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
         var panel = new StackPanel { Margin = new Avalonia.Thickness(20) };
-        panel.Children.Add(new TextBlock { Text = "✓ Hotkeys saved successfully!", FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 15) });
+        panel.Children.Add(new TextBlock { Text = "✓ Hotkeys saved and registered successfully!", FontSize = 14, Margin = new Avalonia.Thickness(0, 0, 0, 15) });
         var okButton = new Button { Content = "OK", Width = 80, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center };
         okButton.Click += (s, args) => messageBox.Close();
         panel.Children.Add(okButton);
@@ -406,6 +412,15 @@ public partial class MainWindow : Window
                 var windowManager = new WindowTabsFree.Core.Services.WindowManagerService(windowService, configService);
                 
                 _floatingWindow = new FloatingWindowManager(windowManager, windowService, configService);
+                
+                // Subscribe to the Closed event to restore main window
+                _floatingWindow.Closed += (s, args) =>
+                {
+                    // Restore and activate main window when floating window closes
+                    WindowState = WindowState.Normal;
+                    Activate();
+                };
+                
                 _floatingWindow.Show();
                 
                 // Minimize main window

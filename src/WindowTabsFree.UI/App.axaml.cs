@@ -17,10 +17,14 @@ public partial class App : Application
     private IHotkeyService? _hotkeyService;
     private WindowManagerService? _windowManager;
     private IConfigurationService? _configService;
+    
+    // Make this public so MainWindow can re-register hotkeys
+    public new static App? Current { get; private set; }
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        Current = this;
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -64,6 +68,9 @@ public partial class App : Application
         if (settings.HotKeys == null)
             return;
 
+        // Unregister existing hotkeys first
+        _hotkeyService.UnregisterAllHotkeys();
+
         // Register NextWindow hotkey (ID: 1)
         if (!string.IsNullOrWhiteSpace(settings.HotKeys.NextWindow))
         {
@@ -95,6 +102,12 @@ public partial class App : Application
                 }
             });
         }
+    }
+
+    // Public method to re-register hotkeys after configuration changes
+    public void ReRegisterHotkeys()
+    {
+        RegisterGlobalHotkeys();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
