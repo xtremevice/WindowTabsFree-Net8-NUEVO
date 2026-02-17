@@ -78,7 +78,7 @@ public partial class App : Application
             {
                 try
                 {
-                    _windowManager.ActivateNextWindowGlobally();
+                    _windowManager.ActivateNextWindowInCurrentGroup();
                 }
                 catch (Exception ex)
                 {
@@ -94,7 +94,7 @@ public partial class App : Application
             {
                 try
                 {
-                    _windowManager.ActivatePreviousWindowGlobally();
+                    _windowManager.ActivatePreviousWindowInCurrentGroup();
                 }
                 catch (Exception ex)
                 {

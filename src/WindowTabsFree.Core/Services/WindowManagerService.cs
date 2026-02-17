@@ -433,4 +433,64 @@ public class WindowManagerService
         
         _windowService.SetFocus(windows[prevIndex].Handle);
     }
+
+    /// <summary>
+    /// Activates the next window in the current window's group, or cycles through all windows if not grouped
+    /// </summary>
+    public void ActivateNextWindowInCurrentGroup()
+    {
+        var currentWindow = _windowService.GetForegroundWindow();
+        
+        // Find which group contains the current window
+        var currentGroup = _configurationService.Settings.TabGroups
+            .FirstOrDefault(g => g.WindowHandles.Contains(currentWindow));
+        
+        if (currentGroup != null && currentGroup.WindowHandles.Count > 1)
+        {
+            // Current window is in a group, cycle within the group
+            var currentIndex = currentGroup.WindowHandles.IndexOf(currentWindow);
+            var nextIndex = (currentIndex + 1) % currentGroup.WindowHandles.Count;
+            
+            currentGroup.ActiveWindowIndex = nextIndex;
+            currentGroup.LastModifiedAt = DateTime.UtcNow;
+            
+            _windowService.SetFocus(currentGroup.WindowHandles[nextIndex]);
+            _configurationService.SaveSettings(_configurationService.Settings);
+        }
+        else
+        {
+            // Not in a group or group has only one window, use global navigation
+            ActivateNextWindowGlobally();
+        }
+    }
+
+    /// <summary>
+    /// Activates the previous window in the current window's group, or cycles through all windows if not grouped
+    /// </summary>
+    public void ActivatePreviousWindowInCurrentGroup()
+    {
+        var currentWindow = _windowService.GetForegroundWindow();
+        
+        // Find which group contains the current window
+        var currentGroup = _configurationService.Settings.TabGroups
+            .FirstOrDefault(g => g.WindowHandles.Contains(currentWindow));
+        
+        if (currentGroup != null && currentGroup.WindowHandles.Count > 1)
+        {
+            // Current window is in a group, cycle within the group
+            var currentIndex = currentGroup.WindowHandles.IndexOf(currentWindow);
+            var prevIndex = (currentIndex - 1 + currentGroup.WindowHandles.Count) % currentGroup.WindowHandles.Count;
+            
+            currentGroup.ActiveWindowIndex = prevIndex;
+            currentGroup.LastModifiedAt = DateTime.UtcNow;
+            
+            _windowService.SetFocus(currentGroup.WindowHandles[prevIndex]);
+            _configurationService.SaveSettings(_configurationService.Settings);
+        }
+        else
+        {
+            // Not in a group or group has only one window, use global navigation
+            ActivatePreviousWindowGlobally();
+        }
+    }
 }
