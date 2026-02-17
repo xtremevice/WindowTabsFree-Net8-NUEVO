@@ -51,6 +51,7 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **Control windows**: Focus, Minimize, Maximize, Restore, Close
 - **Real-time updates** every 2 seconds
 - **Cross-platform**: Works on Windows, Linux (X11), and macOS
+- **🎯 Global hotkeys**: Switch between windows even when app is not focused (Windows only)
 
 ### Tab Grouping
 - **Auto-grouping by application**: Check the "Auto-group" checkbox per application
@@ -78,6 +79,7 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **[README_NET8.md](README_NET8.md)** - Full feature documentation
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide (English)
 - **[QUICKSTART_ES.md](QUICKSTART_ES.md)** - Guía rápida (Español)
+- **[HOTKEYS.md](HOTKEYS.md)** - 🎯 Global hotkeys guide
 
 ### Feature Guides
 - **[GUIA_AGRUPACION.md](GUIA_AGRUPACION.md)** - Auto-grouping and tab navigation (Spanish)
