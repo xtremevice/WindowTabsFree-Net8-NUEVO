@@ -35,6 +35,13 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             
+            // Check and request Accessibility permissions on macOS
+            if (OperatingSystem.IsMacOS())
+            {
+                Console.WriteLine("[macOS] Checking Accessibility permissions for hotkeys...");
+                WindowTabsFree.Services.macOS.MacOSHotkeyService.CheckAndRequestAccessibilityPermissions();
+            }
+            
             // Initialize services
             _configService = new ConfigurationService();
             var windowService = WindowTabsFree.Services.WindowServiceFactory.Create();

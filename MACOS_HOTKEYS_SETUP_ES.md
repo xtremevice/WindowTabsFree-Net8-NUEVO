@@ -4,6 +4,22 @@
 
 WindowTabsFree utiliza atajos de teclado globales para cambiar entre ventanas. En macOS, los atajos globales requieren **permisos de Accesibilidad** para funcionar correctamente.
 
+**NUEVO:** ¡La aplicación ahora solicita automáticamente estos permisos cuando la inicias por primera vez!
+
+## Solicitud Automática de Permisos
+
+Cuando inicias WindowTabsFree por primera vez en macOS, el sistema mostrará automáticamente un diálogo solicitando permisos de Accesibilidad.
+
+**Lo que verás:**
+- Un diálogo del sistema diciendo que WindowTabsFree quiere controlar tu computadora
+- Esto es normal y necesario para la funcionalidad de los atajos de teclado
+
+**Qué hacer:**
+1. Haz clic en **Abrir Configuración del Sistema** en el diálogo
+2. En la configuración de Seguridad y Privacidad que se abre, haz clic en el candado 🔒 para hacer cambios
+3. Marca la casilla junto a WindowTabsFree en la lista de Accesibilidad
+4. Reinicia WindowTabsFree
+
 ## Error Común
 
 Si ves este error en la consola:

@@ -34,11 +34,80 @@ public class MacOSHotkeyService : IHotkeyService
     [DllImport("/System/Library/Frameworks/Carbon.framework/Carbon")]
     private static extern int UnregisterEventHotKey(IntPtr inHotKey);
 
+    // P/Invoke declarations for Accessibility APIs
+    [DllImport("/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
+    private static extern bool AXIsProcessTrustedWithOptions(IntPtr options);
+
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern IntPtr CFDictionaryCreate(IntPtr allocator, IntPtr[] keys, IntPtr[] values,
+        int numValues, IntPtr keyCallBacks, IntPtr valueCallBacks);
+
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern IntPtr CFStringCreateWithCString(IntPtr allocator, string cStr, uint encoding);
+
+    [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
+    private static extern void CFRelease(IntPtr cf);
+
+    private const uint kCFStringEncodingUTF8 = 0x08000100;
+    private static readonly string kAXTrustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt";
+
     [StructLayout(LayoutKind.Sequential)]
     private struct EventHotKeyID
     {
         public uint signature;
         public uint id;
+    }
+
+    /// <summary>
+    /// Checks if the app has Accessibility permissions and prompts user if not
+    /// </summary>
+    public static bool CheckAndRequestAccessibilityPermissions()
+    {
+        try
+        {
+            // Create the prompt key
+            IntPtr promptKey = CFStringCreateWithCString(IntPtr.Zero, kAXTrustedCheckOptionPrompt, kCFStringEncodingUTF8);
+            
+            // Create a CFBoolean true value (1 means true in CF land)
+            IntPtr trueValue = new IntPtr(1);
+            
+            // Create dictionary with the prompt option
+            IntPtr[] keys = new IntPtr[] { promptKey };
+            IntPtr[] values = new IntPtr[] { trueValue };
+            
+            IntPtr options = CFDictionaryCreate(
+                IntPtr.Zero,
+                keys,
+                values,
+                1,
+                IntPtr.Zero,
+                IntPtr.Zero
+            );
+
+            // Check if process is trusted, this will show the system dialog if not
+            bool isTrusted = AXIsProcessTrustedWithOptions(options);
+
+            // Clean up
+            CFRelease(options);
+            CFRelease(promptKey);
+
+            if (isTrusted)
+            {
+                Console.WriteLine("[macOS] Accessibility permissions already granted ✓");
+            }
+            else
+            {
+                Console.WriteLine("[macOS] Accessibility permissions required - system dialog should appear");
+                Console.WriteLine("[macOS] Please grant permissions in System Settings and restart the app");
+            }
+
+            return isTrusted;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[macOS] Error checking Accessibility permissions: {ex.Message}");
+            return false;
+        }
     }
 
     public bool RegisterHotkey(int id, string hotkeyString, Action callback)
@@ -73,7 +142,19 @@ public class MacOSHotkeyService : IHotkeyService
                 else
                 {
                     Console.WriteLine($"[macOS] RegisterEventHotKey failed with code: {result}");
-                    Console.WriteLine($"[macOS] Note: Global hotkeys may require Accessibility permissions on modern macOS");
+                    
+                    // If error is -50 (parameter error), it's likely a permissions issue
+                    if (result == -50)
+                    {
+                        Console.WriteLine($"[macOS] Error -50 typically means missing Accessibility permissions");
+                        Console.WriteLine($"[macOS] The system should have prompted for permissions on app launch");
+                        Console.WriteLine($"[macOS] If not, please check System Settings → Privacy & Security → Accessibility");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[macOS] Note: Global hotkeys may require Accessibility permissions on modern macOS");
+                    }
+                    
                     // Return true anyway to not block the app, hotkeys just won't work
                     return true;
                 }

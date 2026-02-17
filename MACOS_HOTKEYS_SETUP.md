@@ -4,6 +4,22 @@
 
 WindowTabsFree uses global hotkeys to switch between windows. On macOS, global hotkeys require **Accessibility permissions** to function properly.
 
+**NEW:** The app now automatically requests these permissions when you first launch it!
+
+## Automatic Permission Request
+
+When you launch WindowTabsFree for the first time on macOS, the system will automatically show a dialog requesting Accessibility permissions. 
+
+**What you'll see:**
+- A system dialog saying WindowTabsFree wants to control your computer
+- This is normal and required for hotkey functionality
+
+**What to do:**
+1. Click **Open System Settings** in the dialog
+2. In the Security & Privacy settings that open, click the lock 🔒 to make changes
+3. Check the box next to WindowTabsFree in the Accessibility list
+4. Restart WindowTabsFree
+
 ## Common Error
 
 If you see this error in the console:
