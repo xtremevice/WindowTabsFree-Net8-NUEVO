@@ -162,7 +162,7 @@ public class MacOSHotkeyService : IHotkeyService
                     Console.WriteLine("[macOS] ");
                 }
                 
-                Console.WriteLine("[macOS] For detailed instructions, see: MACOS_HOTKEYS_SETUP_ES.md");
+                Console.WriteLine("[macOS] For detailed instructions, see: MACOS_HOTKEYS_SETUP.md");
             }
 
             return isTrusted;

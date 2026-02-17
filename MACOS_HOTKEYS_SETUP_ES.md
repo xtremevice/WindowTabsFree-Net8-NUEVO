@@ -70,8 +70,8 @@ sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db \
 
 **Síntoma:** Aparece el error:
 ```
-[macOS] RegisterEventHotKey failed with code: -50
-[macOS] Error -50 typically means missing Accessibility permissions
+[macOS] RegisterEventHotKey falló con código: -50
+[macOS] El error -50 generalmente significa permisos de Accesibilidad faltantes
 ```
 
 Y en Configuración del Sistema → Accesibilidad aparece "Terminal" o "iTerm2" en lugar de WindowTabsFree.
