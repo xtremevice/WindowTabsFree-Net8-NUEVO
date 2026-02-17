@@ -55,44 +55,69 @@ public class MacOSHotkeyService : IHotkeyService
     private const uint kCFStringEncodingUTF8 = 0x08000100;
     private static readonly string kAXTrustedCheckOptionPrompt = "AXTrustedCheckOptionPrompt";
 
-    // Lazy-loaded kCFBooleanTrue constant
+    // Lazy-loaded kCFBooleanTrue constant with thread-safe initialization
+    private static readonly object _cfBooleanTrueLock = new object();
     private static IntPtr? _cfBooleanTrue = null;
+    
     private static IntPtr GetCFBooleanTrue()
     {
-        if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
+        // Thread-safe lazy initialization
+        lock (_cfBooleanTrueLock)
         {
-            // Get the address of kCFBooleanTrue from the framework
-            // It's exported as a symbol, we need to use dlsym to get it
-            IntPtr handle = dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", RTLD_NOW);
-            if (handle != IntPtr.Zero)
-            {
-                IntPtr symbolAddr = dlsym(handle, "kCFBooleanTrue");
-                if (symbolAddr != IntPtr.Zero)
-                {
-                    // Dereference the pointer to get the actual kCFBooleanTrue value
-                    _cfBooleanTrue = Marshal.ReadIntPtr(symbolAddr);
-                }
-                dlclose(handle);
-            }
-            
-            // If we still couldn't get it, set to Zero
             if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
             {
-                _cfBooleanTrue = IntPtr.Zero;
+                // Get the address of kCFBooleanTrue from the framework
+                // It's exported as a symbol, we need to use dlsym to get it
+                IntPtr handle = dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", RTLD_NOW);
+                if (handle != IntPtr.Zero)
+                {
+                    IntPtr symbolAddr = dlsym(handle, "kCFBooleanTrue");
+                    if (symbolAddr != IntPtr.Zero)
+                    {
+                        // Dereference the pointer to get the actual kCFBooleanTrue value
+                        _cfBooleanTrue = Marshal.ReadIntPtr(symbolAddr);
+                        Console.WriteLine("[macOS] Successfully loaded kCFBooleanTrue constant");
+                    }
+                    else
+                    {
+                        Console.WriteLine("[macOS] Warning: Could not find kCFBooleanTrue symbol in CoreFoundation");
+                        // Try to get error from dlerror
+                        IntPtr errorPtr = dlerror();
+                        if (errorPtr != IntPtr.Zero)
+                        {
+                            string? error = Marshal.PtrToStringAnsi(errorPtr);
+                            Console.WriteLine($"[macOS] dlsym error: {error}");
+                        }
+                    }
+                    dlclose(handle);
+                }
+                else
+                {
+                    Console.WriteLine("[macOS] Warning: Could not open CoreFoundation framework");
+                }
+                
+                // If we still couldn't get it, set to Zero
+                if (_cfBooleanTrue == null || _cfBooleanTrue.Value == IntPtr.Zero)
+                {
+                    _cfBooleanTrue = IntPtr.Zero;
+                }
             }
         }
         return _cfBooleanTrue.Value;
     }
 
-    // Dynamic library loading functions
-    [DllImport("libdl")]
+    // Dynamic library loading functions - use libSystem for better compatibility
+    [DllImport("libSystem")]
     private static extern IntPtr dlopen(string filename, int flags);
     
-    [DllImport("libdl")]
+    [DllImport("libSystem")]
     private static extern IntPtr dlsym(IntPtr handle, string symbol);
     
-    [DllImport("libdl")]
+    [DllImport("libSystem")]
     private static extern int dlclose(IntPtr handle);
+    
+    [DllImport("libSystem")]
+    private static extern IntPtr dlerror();
     
     private const int RTLD_NOW = 2;
 
