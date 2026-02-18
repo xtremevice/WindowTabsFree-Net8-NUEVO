@@ -12,7 +12,7 @@ public class LinuxHotkeyService : IHotkeyService
 {
     public bool RegisterHotkey(int id, string hotkeyString, Action callback)
     {
-        Console.WriteLine($"[Linux] Hotkey registration not yet implemented: {hotkeyString}");
+        // Silently ignore - Linux implementation pending
         // TODO: Implement using X11 XGrabKey or DBus
         return false;
     }

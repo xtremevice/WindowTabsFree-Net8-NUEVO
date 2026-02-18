@@ -11,7 +11,7 @@ namespace WindowTabsFree.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private const int RefreshIntervalMs = 2000; // Refresh window list every 2 seconds
+    private const int RefreshIntervalMs = 10000; // Refresh window list every 10 seconds
     
     private readonly WindowManagerService _windowManager;
     private readonly System.Timers.Timer _refreshTimer;
@@ -150,6 +150,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             // Check if auto-group is enabled for this application
             window.IsAutoGroupEnabled = _windowManager.IsAutoGroupEnabledForApplication(window.ProcessName);
         }
+        
+        // Sort alphabetically by DisplayTitle
+        windows.Sort((a, b) => string.Compare(a.DisplayTitle, b.DisplayTitle, StringComparison.OrdinalIgnoreCase));
         
         // Update on UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>

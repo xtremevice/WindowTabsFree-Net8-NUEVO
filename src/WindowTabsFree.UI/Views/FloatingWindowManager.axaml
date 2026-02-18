@@ -82,7 +82,8 @@
                                                 <TextBlock Text="{Binding DisplayTitle}" 
                                                           FontSize="10" 
                                                           TextWrapping="NoWrap"
-                                                          TextTrimming="CharacterEllipsis"/>
+                                                          TextTrimming="CharacterEllipsis"
+                                                          Foreground="#000000"/>
                                             </Button>
                                         </StackPanel>
                                     </DataTemplate>
