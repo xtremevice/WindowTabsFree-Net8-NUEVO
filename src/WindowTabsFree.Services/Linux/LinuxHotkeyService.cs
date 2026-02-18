@@ -12,8 +12,11 @@ public class LinuxHotkeyService : IHotkeyService
 {
     public bool RegisterHotkey(int id, string hotkeyString, Action callback)
     {
-        // Silently ignore - Linux implementation pending
-        // TODO: Implement using X11 XGrabKey or DBus
+        // Linux global hotkeys not yet implemented
+        Console.WriteLine("[Linux] ⚠️  Global hotkeys are not yet implemented on Linux");
+        Console.WriteLine("[Linux] This requires X11 XGrabKey or Wayland equivalent");
+        Console.WriteLine("[Linux] You can still use the UI buttons to switch windows");
+        Console.WriteLine($"[Linux] Attempted to register: {hotkeyString}");
         return false;
     }
 

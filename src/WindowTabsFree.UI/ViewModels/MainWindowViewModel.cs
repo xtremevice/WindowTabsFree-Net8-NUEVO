@@ -169,10 +169,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // Sort alphabetically by DisplayTitle
         windows.Sort((a, b) => string.Compare(a.DisplayTitle, b.DisplayTitle, StringComparison.OrdinalIgnoreCase));
         
+        // Deduplicate by DisplayTitle - keep first occurrence
+        var uniqueWindows = windows
+            .GroupBy(w => w.DisplayTitle)
+            .Select(g => g.First())
+            .ToList();
+        
         // Update on UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            Windows = new ObservableCollection<WindowInfo>(windows);
+            Windows = new ObservableCollection<WindowInfo>(uniqueWindows);
         });
     }
 

@@ -418,7 +418,12 @@ public partial class MainWindow : Window
                 {
                     // Restore and activate main window when floating window closes
                     WindowState = WindowState.Normal;
+                    
+                    // Fix: Set topmost temporarily to ensure window comes to front and is not frozen
+                    Topmost = true;
                     Activate();
+                    Focus();
+                    Topmost = false;
                 };
                 
                 _floatingWindow.Show();
