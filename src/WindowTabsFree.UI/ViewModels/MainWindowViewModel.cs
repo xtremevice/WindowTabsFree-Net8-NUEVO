@@ -21,14 +21,29 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private TabGroup? _selectedTabGroup;
     private WindowInfo? _selectedWindow;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel() : this(null)
+    {
+        // Default parameterless constructor for XAML designer
+        // Actual initialization happens in the constructor with parameters
+    }
+
+    public MainWindowViewModel(WindowManagerService? windowManager)
     {
         // Initialize services
-        var configService = new ConfigurationService();
-        var windowService = WindowTabsFree.Services.WindowServiceFactory.Create();
-        _windowManager = new WindowManagerService(windowService, configService);
+        if (windowManager == null)
+        {
+            // Fallback for XAML designer
+            var configService = new ConfigurationService();
+            var windowService = WindowTabsFree.Services.WindowServiceFactory.Create();
+            _windowManager = new WindowManagerService(windowService, configService);
+        }
+        else
+        {
+            // Use the shared instance passed from App
+            _windowManager = windowManager;
+        }
 
-        // Initialize timer for auto-refresh (every 2 seconds)
+        // Initialize timer for auto-refresh (every 10 seconds)
         _refreshTimer = new System.Timers.Timer(RefreshIntervalMs);
         _refreshTimer.Elapsed += OnTimerElapsed;
         _refreshTimer.AutoReset = true;

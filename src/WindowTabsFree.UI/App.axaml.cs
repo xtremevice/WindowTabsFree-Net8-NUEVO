@@ -59,7 +59,7 @@ public partial class App : Application
             
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel(_windowManager),
             };
 
             // Cleanup on exit
@@ -87,10 +87,12 @@ public partial class App : Application
         // Register NextWindow hotkey (ID: 1)
         if (!string.IsNullOrWhiteSpace(settings.HotKeys.NextWindow))
         {
+            Console.WriteLine($"[Hotkeys] Registering NextWindow hotkey: {settings.HotKeys.NextWindow}");
             _hotkeyService.RegisterHotkey(1, settings.HotKeys.NextWindow, () =>
             {
                 try
                 {
+                    Console.WriteLine("[Hotkeys] NextWindow hotkey pressed - activating next window");
                     _windowManager.ActivateNextWindowInCurrentGroup();
                 }
                 catch (Exception ex)
@@ -103,10 +105,12 @@ public partial class App : Application
         // Register PreviousWindow hotkey (ID: 2)
         if (!string.IsNullOrWhiteSpace(settings.HotKeys.PreviousWindow))
         {
+            Console.WriteLine($"[Hotkeys] Registering PreviousWindow hotkey: {settings.HotKeys.PreviousWindow}");
             _hotkeyService.RegisterHotkey(2, settings.HotKeys.PreviousWindow, () =>
             {
                 try
                 {
+                    Console.WriteLine("[Hotkeys] PreviousWindow hotkey pressed - activating previous window");
                     _windowManager.ActivatePreviousWindowInCurrentGroup();
                 }
                 catch (Exception ex)
