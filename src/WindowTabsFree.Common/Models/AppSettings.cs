@@ -31,6 +31,11 @@ public class AppSettings
     public List<string> ExcludedApplications { get; set; } = new();
 
     /// <summary>
+    /// List of excluded application paths (for path-based filtering, e.g., /System/Library/)
+    /// </summary>
+    public List<string> ExcludedApplicationPaths { get; set; } = new();
+
+    /// <summary>
     /// Hotkeys configuration
     /// </summary>
     public HotKeysSettings HotKeys { get; set; } = new();

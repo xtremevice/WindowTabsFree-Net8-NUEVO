@@ -630,4 +630,11 @@ public class LinuxWindowService : IWindowService, IDisposable
     }
 
     #endregion
+
+    public IntPtr GetForegroundWindow()
+    {
+        // TODO: Implement for Linux using X11
+        // Would need to use XGetInputFocus or _NET_ACTIVE_WINDOW
+        return IntPtr.Zero;
+    }
 }

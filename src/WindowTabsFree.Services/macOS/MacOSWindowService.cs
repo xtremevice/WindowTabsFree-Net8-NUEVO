@@ -45,6 +45,10 @@ public class MacOSWindowService : IWindowService, IDisposable
     [DllImport("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")]
     private static extern bool CFBooleanGetValue(IntPtr boolean);
 
+    // libc - Process path
+    [DllImport("libc")]
+    private static extern int proc_pidpath(int pid, byte[] buffer, uint bufferSize);
+
     // AppKit - Application activation
     [DllImport("/System/Library/Frameworks/AppKit.framework/AppKit")]
     private static extern bool NSApplicationActivateIgnoringOtherApps(IntPtr app, bool flag);
@@ -170,6 +174,11 @@ public class MacOSWindowService : IWindowService, IDisposable
                     if (nullIndex >= 0)
                     {
                         windowInfo.ProcessName = System.Text.Encoding.UTF8.GetString(buffer, 0, nullIndex);
+                        // Debug output to help identify system processes
+                        if (!string.IsNullOrWhiteSpace(windowInfo.ProcessName))
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[macOS] Detected process: '{windowInfo.ProcessName}'");
+                        }
                     }
                 }
             }
@@ -183,6 +192,24 @@ public class MacOSWindowService : IWindowService, IDisposable
             {
                 CFNumberGetValue(ownerPIDValue, kCFNumberIntType, out int pid);
                 windowInfo.ProcessId = pid;
+                
+                // Get process path from PID
+                if (pid > 0)
+                {
+                    byte[] pathBuffer = new byte[4096];
+                    int ret = proc_pidpath(pid, pathBuffer, (uint)pathBuffer.Length);
+                    if (ret > 0)
+                    {
+                        int nullIndex = Array.IndexOf(pathBuffer, (byte)0);
+                        if (nullIndex >= 0)
+                        {
+                            windowInfo.ProcessPath = System.Text.Encoding.UTF8.GetString(pathBuffer, 0, nullIndex);
+                            #if DEBUG
+                            System.Diagnostics.Debug.WriteLine($"[macOS] Process path: '{windowInfo.ProcessPath}'");
+                            #endif
+                        }
+                    }
+                }
             }
 
             // Get window layer
@@ -532,5 +559,12 @@ public class MacOSWindowService : IWindowService, IDisposable
     ~MacOSWindowService()
     {
         Dispose(false);
+    }
+
+    public IntPtr GetForegroundWindow()
+    {
+        // TODO: Implement for macOS
+        // Would need to use NSWorkspace.SharedWorkspace.FrontmostApplication
+        return IntPtr.Zero;
     }
 }

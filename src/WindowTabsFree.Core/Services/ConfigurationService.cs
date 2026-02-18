@@ -86,7 +86,75 @@ public class ConfigurationService : IConfigurationService
             StartWithWindows = false,
             ShowInSystemTray = true,
             MinimizeToTray = true,
-            ExcludedApplications = new List<string>(),
+            ExcludedApplications = new List<string>
+            {
+                // Windows system processes
+                "explorer",
+                "taskmgr",
+                "dwm",
+                "SearchUI",
+                "SearchApp",
+                "ShellExperienceHost",
+                "ApplicationFrameHost",
+                "TextInputHost",
+                "LockApp",
+                "StartMenuExperienceHost",
+                "SystemSettings",
+                
+                // macOS system processes - comprehensive list with all case variations
+                "Dock",
+                "dock",
+                "Control Center",
+                "ControlCenter",
+                "control center",
+                "controlcenter",
+                "NotificationCenter",
+                "Notification Center",
+                "notification center",
+                "notificationcenter",
+                "SystemUIServer",
+                "WindowServer",
+                "Window Server",
+                "windowserver",
+                "loginwindow",
+                "CoreServicesUIAgent",
+                "UserEventAgent",
+                "Problem Reporter",
+                "ProblemReporter",
+                "problem reporter",
+                "problemreporter",
+                "Spotlight",
+                "spotlight",
+                // Additional macOS system UI components
+                "ReportCrash",
+                "CrashReporter",
+                "UserNotificationCenter",
+                "NotificationCenterUI",
+                "com.apple.controlcenter",
+                "com.apple.notificationcenterui",
+                "com.apple.problemreporter",
+                "com.apple.dock",
+                "com.apple.WindowServer",
+                // More macOS variants
+                "NC",
+                "NCBulletinBoard",
+                
+                // Linux system processes
+                "gnome-shell",
+                "plasmashell",
+                "xfce4-panel",
+                "lxpanel",
+                "mate-panel",
+                "cinnamon"
+            },
+            ExcludedApplicationPaths = new List<string>
+            {
+                // macOS system paths
+                "/System/Library/CoreServices/",
+                "/System/Library/PrivateFrameworks/",
+                "/System/Library/Frameworks/",
+                "/usr/libexec/"
+            },
             HotKeys = new HotKeysSettings
             {
                 ToggleManagerWindow = "Ctrl+Alt+T",

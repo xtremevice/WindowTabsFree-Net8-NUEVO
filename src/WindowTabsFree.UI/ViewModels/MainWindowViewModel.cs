@@ -11,23 +11,39 @@ namespace WindowTabsFree.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    private const int RefreshIntervalMs = 2000; // Refresh window list every 2 seconds
+    private const int RefreshIntervalMs = 10000; // Refresh window list every 10 seconds
     
     private readonly WindowManagerService _windowManager;
     private readonly System.Timers.Timer _refreshTimer;
     private ObservableCollection<WindowInfo> _windows = new();
     private ObservableCollection<TabGroup> _tabGroups = new();
+    private ObservableCollection<TabGroup> _manualTabGroups = new();
     private TabGroup? _selectedTabGroup;
     private WindowInfo? _selectedWindow;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel() : this(null)
+    {
+        // Default parameterless constructor for XAML designer
+        // Actual initialization happens in the constructor with parameters
+    }
+
+    public MainWindowViewModel(WindowManagerService? windowManager)
     {
         // Initialize services
-        var configService = new ConfigurationService();
-        var windowService = WindowTabsFree.Services.WindowServiceFactory.Create();
-        _windowManager = new WindowManagerService(windowService, configService);
+        if (windowManager == null)
+        {
+            // Fallback for XAML designer
+            var configService = new ConfigurationService();
+            var windowService = WindowTabsFree.Services.WindowServiceFactory.Create();
+            _windowManager = new WindowManagerService(windowService, configService);
+        }
+        else
+        {
+            // Use the shared instance passed from App
+            _windowManager = windowManager;
+        }
 
-        // Initialize timer for auto-refresh (every 2 seconds)
+        // Initialize timer for auto-refresh (every 10 seconds)
         _refreshTimer = new System.Timers.Timer(RefreshIntervalMs);
         _refreshTimer.Elapsed += OnTimerElapsed;
         _refreshTimer.AutoReset = true;
@@ -55,7 +71,26 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _tabGroups = value;
             OnPropertyChanged(nameof(TabGroups));
+            // Update cached manual groups
+            UpdateManualTabGroups();
         }
+    }
+
+    public ObservableCollection<TabGroup> ManualTabGroups
+    {
+        get => _manualTabGroups;
+        private set
+        {
+            _manualTabGroups = value;
+            OnPropertyChanged(nameof(ManualTabGroups));
+        }
+    }
+
+    private void UpdateManualTabGroups()
+    {
+        // Cache filtered manual groups to avoid recreating on every access
+        var manualGroups = _tabGroups.Where(g => !g.IsAutoGrouped).ToList();
+        ManualTabGroups = new ObservableCollection<TabGroup>(manualGroups);
     }
 
     public TabGroup? SelectedTabGroup
@@ -108,6 +143,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         try
         {
             RefreshWindows();
+            RefreshTabGroups(); // Also refresh tab groups to update window titles
         }
         catch (Exception ex)
         {
@@ -130,10 +166,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             window.IsAutoGroupEnabled = _windowManager.IsAutoGroupEnabledForApplication(window.ProcessName);
         }
         
+        // Sort alphabetically by DisplayTitle
+        windows.Sort((a, b) => string.Compare(a.DisplayTitle, b.DisplayTitle, StringComparison.OrdinalIgnoreCase));
+        
+        // Deduplicate by DisplayTitle - keep first occurrence
+        var uniqueWindows = windows
+            .GroupBy(w => w.DisplayTitle)
+            .Select(g => g.First())
+            .ToList();
+        
         // Update on UI thread
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            Windows = new ObservableCollection<WindowInfo>(windows);
+            Windows = new ObservableCollection<WindowInfo>(uniqueWindows);
         });
     }
 
@@ -159,7 +204,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             }
         }
         
-        TabGroups = new ObservableCollection<TabGroup>(groups);
+        // Update on UI thread to ensure window titles are refreshed in real-time
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            TabGroups = new ObservableCollection<TabGroup>(groups);
+        });
     }
 
     public void FocusWindow(WindowInfo window)
@@ -209,6 +258,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void RemoveWindowFromGroup(WindowInfo window, TabGroup group)
     {
         _windowManager.RemoveWindowFromGroup(group.Id, window.Handle);
+        RefreshTabGroups();
+    }
+
+    public void RemoveWindowFromGroup(WindowInfo window)
+    {
+        // Find which group(s) contain this window and remove it
+        foreach (var group in _tabGroups.ToList())
+        {
+            if (group.WindowHandles.Contains(window.Handle))
+            {
+                _windowManager.RemoveWindowFromGroup(group.Id, window.Handle);
+            }
+        }
         RefreshTabGroups();
     }
 

@@ -16,12 +16,26 @@ namespace WindowTabsFree.UI.Views
         private readonly IConfigurationService _configService;
         private DispatcherTimer? _refreshTimer;
 
+        // Parameterless constructor for XAML designer support only
+        public FloatingWindowManager()
+        {
+            InitializeComponent();
+            // Services will be null - this constructor is only for XAML designer
+            // At runtime, the parameterized constructor should always be used
+            _windowManager = null!;
+            _windowService = null!;
+            _configService = null!;
+        }
+
         public FloatingWindowManager(WindowManagerService windowManager, IWindowService windowService, IConfigurationService configService)
         {
             InitializeComponent();
             _windowManager = windowManager;
             _windowService = windowService;
             _configService = configService;
+            
+            // Set up drag functionality for the header
+            SetupDragBehavior();
             
             // Set up refresh timer
             _refreshTimer = new DispatcherTimer
@@ -35,6 +49,21 @@ namespace WindowTabsFree.UI.Views
             RefreshGroups();
         }
 
+        private void SetupDragBehavior()
+        {
+            var dragHeader = this.FindControl<Grid>("DragHeader");
+            if (dragHeader != null)
+            {
+                dragHeader.PointerPressed += (s, e) =>
+                {
+                    if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+                    {
+                        BeginMoveDrag(e);
+                    }
+                };
+            }
+        }
+
         private void RefreshTimer_Tick(object? sender, EventArgs e)
         {
             RefreshGroups();
@@ -45,6 +74,9 @@ namespace WindowTabsFree.UI.Views
             try
             {
                 var groups = _windowManager.GetTabGroups().ToList();
+                
+                // Get the currently focused window to properly mark it
+                var foregroundWindow = _windowService.GetForegroundWindow();
                 
                 // Populate WindowsInfo for each group
                 foreach (var group in groups)
@@ -65,12 +97,13 @@ namespace WindowTabsFree.UI.Views
                         .Where(w => w != null)
                         .ToList();
                     
-                    // Mark active window in group
+                    // Mark active window based on actual foreground window
                     for (int i = 0; i < windows.Count; i++)
                     {
                         if (windows[i] != null)
                         {
-                            windows[i]!.IsActiveInGroup = (i == group.ActiveWindowIndex);
+                            // Check if this is the currently focused window system-wide
+                            windows[i]!.IsActiveInGroup = (windows[i]!.Handle == foregroundWindow);
                         }
                     }
                     
@@ -90,6 +123,9 @@ namespace WindowTabsFree.UI.Views
             if (sender is Button button && button.Tag is WindowInfo windowInfo)
             {
                 _windowService.SetFocus(windowInfo.Handle);
+                
+                // Refresh immediately to update visual feedback
+                RefreshGroups();
             }
         }
 
@@ -99,12 +135,6 @@ namespace WindowTabsFree.UI.Views
             {
                 Topmost = toggle.IsChecked ?? true;
             }
-        }
-
-        private async void ConfigureHotkeys_Click(object? sender, RoutedEventArgs e)
-        {
-            var hotkeyWindow = new HotkeyConfigWindow(_configService);
-            await hotkeyWindow.ShowDialog(this);
         }
 
         private void CloseWindow_Click(object? sender, RoutedEventArgs e)

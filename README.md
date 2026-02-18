@@ -51,6 +51,7 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **Control windows**: Focus, Minimize, Maximize, Restore, Close
 - **Real-time updates** every 2 seconds
 - **Cross-platform**: Works on Windows, Linux (X11), and macOS
+- **🎯 Global hotkeys**: Switch between windows even when app is not focused (Windows only)
 
 ### Tab Grouping
 - **Auto-grouping by application**: Check the "Auto-group" checkbox per application
@@ -78,16 +79,20 @@ dotnet publish src/WindowTabsFree.UI/WindowTabsFree.UI.csproj -c Release -r win-
 - **[README_NET8.md](README_NET8.md)** - Full feature documentation
 - **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide (English)
 - **[QUICKSTART_ES.md](QUICKSTART_ES.md)** - Guía rápida (Español)
+- **[HOTKEYS.md](HOTKEYS.md)** - 🎯 Global hotkeys guide
 
 ### Feature Guides
 - **[GUIA_AGRUPACION.md](GUIA_AGRUPACION.md)** - Auto-grouping and tab navigation (Spanish)
 - **[GUIA_USO_MEJORADA.md](GUIA_USO_MEJORADA.md)** - Enhanced features guide (Spanish)
 - **[AUTO_AGRUPACION_Y_TABS.md](AUTO_AGRUPACION_Y_TABS.md)** - Tab system documentation
+- **[SYSTEM_EXCLUSIONS.md](SYSTEM_EXCLUSIONS.md)** - 🚫 System application filtering guide
+- **[SYSTEM_EXCLUSIONS_ES.md](SYSTEM_EXCLUSIONS_ES.md)** - 🚫 Guía de filtrado de aplicaciones del sistema
 
 ### Platform-Specific
 - **[MACOS_GUIDE.md](MACOS_GUIDE.md)** - macOS setup and usage
 - **[GUIA_MAC_APPLE_SILICON.md](GUIA_MAC_APPLE_SILICON.md)** - Mac M1/M2/M3 guide (Spanish)
 - **[MACOS_DETECCION_FIX.md](MACOS_DETECCION_FIX.md)** - macOS window detection fixes
+- **[MACOS_SYSTEM_APPS_FIX.md](MACOS_SYSTEM_APPS_FIX.md)** - 🔧 Fix for macOS system apps still appearing
 
 ### Technical
 - **[LIMITACION_TABS_OVERLAY.md](LIMITACION_TABS_OVERLAY.md)** - Tab overlay limitations explained

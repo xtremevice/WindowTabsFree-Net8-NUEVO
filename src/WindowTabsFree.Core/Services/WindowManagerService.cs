@@ -24,12 +24,26 @@ public class WindowManagerService
     {
         var allWindows = _windowService.GetAllWindows();
         var excludedApps = _configurationService.Settings.ExcludedApplications;
+        var excludedPaths = _configurationService.Settings.ExcludedApplicationPaths;
 
         // Include windows that have either a title OR a process name (but not both empty)
         // This allows detection of Terminal, Brave, GitHub Desktop, games, etc.
         return allWindows.Where(w => 
             (!string.IsNullOrWhiteSpace(w.Title) || !string.IsNullOrWhiteSpace(w.ProcessName)) &&
-            !excludedApps.Contains(w.ProcessName, StringComparer.OrdinalIgnoreCase));
+            !excludedApps.Contains(w.ProcessName, StringComparer.OrdinalIgnoreCase) &&
+            !IsPathExcluded(w.ProcessPath, excludedPaths));
+    }
+
+    /// <summary>
+    /// Checks if a process path matches any excluded path patterns
+    /// </summary>
+    private bool IsPathExcluded(string processPath, List<string> excludedPaths)
+    {
+        if (string.IsNullOrWhiteSpace(processPath) || excludedPaths == null || excludedPaths.Count == 0)
+            return false;
+
+        return excludedPaths.Any(excludedPath => 
+            processPath.StartsWith(excludedPath, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -396,5 +410,101 @@ public class WindowManagerService
         var setting = _configurationService.Settings.ApplicationGroupSettings
             .FirstOrDefault(s => s.ProcessName == processName);
         return setting?.IsAutoGroupEnabled ?? false;
+    }
+
+    /// <summary>
+    /// Activates the next window globally (cycles through all manageable windows)
+    /// </summary>
+    public void ActivateNextWindowGlobally()
+    {
+        var windows = GetManageableWindows().ToList();
+        if (windows.Count == 0)
+            return;
+
+        var currentWindow = _windowService.GetForegroundWindow();
+        var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
+        
+        // Move to next window. If current window is not in list (currentIndex = -1) or is last, wrap to first
+        var nextIndex = (currentIndex + 1) % windows.Count;
+        
+        _windowService.SetFocus(windows[nextIndex].Handle);
+    }
+
+    /// <summary>
+    /// Activates the previous window globally (cycles through all manageable windows)
+    /// </summary>
+    public void ActivatePreviousWindowGlobally()
+    {
+        var windows = GetManageableWindows().ToList();
+        if (windows.Count == 0)
+            return;
+
+        var currentWindow = _windowService.GetForegroundWindow();
+        var currentIndex = windows.FindIndex(w => w.Handle == currentWindow);
+        
+        // Move to previous window. If current window is not in list (currentIndex = -1), wrap to last
+        var prevIndex = currentIndex <= 0 ? windows.Count - 1 : currentIndex - 1;
+        
+        _windowService.SetFocus(windows[prevIndex].Handle);
+    }
+
+    /// <summary>
+    /// Activates the next window in the current window's group, or cycles through all windows if not grouped
+    /// </summary>
+    public void ActivateNextWindowInCurrentGroup()
+    {
+        var currentWindow = _windowService.GetForegroundWindow();
+        
+        // Find which group contains the current window
+        var currentGroup = _configurationService.Settings.TabGroups
+            .FirstOrDefault(g => g.WindowHandles.Contains(currentWindow));
+        
+        if (currentGroup != null && currentGroup.WindowHandles.Count > 1)
+        {
+            // Current window is in a group, cycle within the group
+            var currentIndex = currentGroup.WindowHandles.IndexOf(currentWindow);
+            var nextIndex = (currentIndex + 1) % currentGroup.WindowHandles.Count;
+            
+            currentGroup.ActiveWindowIndex = nextIndex;
+            currentGroup.LastModifiedAt = DateTime.UtcNow;
+            
+            _windowService.SetFocus(currentGroup.WindowHandles[nextIndex]);
+            // Note: Settings will be saved periodically or on app shutdown to avoid excessive disk I/O
+        }
+        else
+        {
+            // Not in a group or group has only one window, use global navigation
+            ActivateNextWindowGlobally();
+        }
+    }
+
+    /// <summary>
+    /// Activates the previous window in the current window's group, or cycles through all windows if not grouped
+    /// </summary>
+    public void ActivatePreviousWindowInCurrentGroup()
+    {
+        var currentWindow = _windowService.GetForegroundWindow();
+        
+        // Find which group contains the current window
+        var currentGroup = _configurationService.Settings.TabGroups
+            .FirstOrDefault(g => g.WindowHandles.Contains(currentWindow));
+        
+        if (currentGroup != null && currentGroup.WindowHandles.Count > 1)
+        {
+            // Current window is in a group, cycle within the group
+            var currentIndex = currentGroup.WindowHandles.IndexOf(currentWindow);
+            var prevIndex = (currentIndex - 1 + currentGroup.WindowHandles.Count) % currentGroup.WindowHandles.Count;
+            
+            currentGroup.ActiveWindowIndex = prevIndex;
+            currentGroup.LastModifiedAt = DateTime.UtcNow;
+            
+            _windowService.SetFocus(currentGroup.WindowHandles[prevIndex]);
+            // Note: Settings will be saved periodically or on app shutdown to avoid excessive disk I/O
+        }
+        else
+        {
+            // Not in a group or group has only one window, use global navigation
+            ActivatePreviousWindowGlobally();
+        }
     }
 }
