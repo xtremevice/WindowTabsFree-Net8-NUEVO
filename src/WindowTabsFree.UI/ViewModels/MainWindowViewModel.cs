@@ -55,6 +55,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _tabGroups = value;
             OnPropertyChanged(nameof(TabGroups));
+            OnPropertyChanged(nameof(ManualTabGroups));
+        }
+    }
+
+    public ObservableCollection<TabGroup> ManualTabGroups
+    {
+        get
+        {
+            // Return only manually created groups (not auto-grouped)
+            var manualGroups = _tabGroups.Where(g => !g.IsAutoGrouped).ToList();
+            return new ObservableCollection<TabGroup>(manualGroups);
         }
     }
 
@@ -164,6 +175,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             TabGroups = new ObservableCollection<TabGroup>(groups);
+            OnPropertyChanged(nameof(ManualTabGroups)); // Notify manual groups changed too
         });
     }
 

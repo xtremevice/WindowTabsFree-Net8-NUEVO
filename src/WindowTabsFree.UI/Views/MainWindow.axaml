@@ -244,6 +244,7 @@
                                                          Click="ToggleAutoGroupCheckBox_Click"
                                                          FontSize="11"
                                                          FontWeight="Bold"
+                                                         Foreground="#1976D2"
                                                          ToolTip.Tip="Check to automatically group all windows of this app together (requires 2+ windows)"/>
                                             </Grid>
                                             
@@ -278,6 +279,36 @@
                                                 </StackPanel>
                                             </Grid>
 
+                                            <!-- Add to Group Section -->
+                                            <Border BorderBrush="#E0E0E0" BorderThickness="1" 
+                                                   Padding="8" Margin="0,10,0,0"
+                                                   Background="#F5F5F5"
+                                                   CornerRadius="4">
+                                                <StackPanel Spacing="8">
+                                                    <TextBlock Text="➕ Add to Group:" 
+                                                              FontSize="11" 
+                                                              FontWeight="Bold"
+                                                              Foreground="#424242"/>
+                                                    <ComboBox Name="GroupSelectionComboBox"
+                                                             ItemsSource="{Binding $parent[Window].DataContext.ManualTabGroups}"
+                                                             SelectedItem="{Binding $parent[Window].DataContext.SelectedTabGroup}"
+                                                             PlaceholderText="Select a group..."
+                                                             DisplayMemberBinding="{Binding Name}"
+                                                             MinWidth="200"
+                                                             FontSize="11"/>
+                                                    <Button Content="➕ Add to Selected Group" 
+                                                           Tag="{Binding}" 
+                                                           Click="AddToGroupButton_Click"
+                                                           Height="28"
+                                                           Background="#C8E6C9"
+                                                           Foreground="#2E7D32"
+                                                           FontWeight="Bold"
+                                                           FontSize="11"
+                                                           HorizontalAlignment="Stretch"
+                                                           IsEnabled="{Binding $parent[Window].DataContext.CanAddToGroup}"/>
+                                                </StackPanel>
+                                            </Border>
+
                                             <!-- Action Buttons -->
                                             <StackPanel Orientation="Horizontal" 
                                                        Spacing="5" 
@@ -288,14 +319,6 @@
                                                        Width="70"
                                                        Height="28"
                                                        Background="#FFCDD2"/>
-                                                <Button Content="➕ Add to Group" 
-                                                       Tag="{Binding}" 
-                                                       Click="AddToGroupButton_Click"
-                                                       Width="120"
-                                                       Height="28"
-                                                       Background="#C8E6C9"
-                                                       FontWeight="Bold"
-                                                       IsEnabled="{Binding $parent[Window].DataContext.CanAddToGroup}"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Border>
