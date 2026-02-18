@@ -261,6 +261,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         RefreshTabGroups();
     }
 
+    public void RemoveWindowFromGroup(WindowInfo window)
+    {
+        // Find which group(s) contain this window and remove it
+        foreach (var group in _tabGroups.ToList())
+        {
+            if (group.WindowHandles.Contains(window.Handle))
+            {
+                _windowManager.RemoveWindowFromGroup(group.Id, window.Handle);
+            }
+        }
+        RefreshTabGroups();
+    }
+
     public void AutoGroupByApplication()
     {
         _windowManager.AutoGroupByApplication();

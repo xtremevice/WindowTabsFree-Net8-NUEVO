@@ -387,6 +387,18 @@ public partial class MainWindow : Window
         }
     }
 
+    private void RemoveFromGroupButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is WindowInfo window)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                // Find which group this window belongs to
+                viewModel.RemoveWindowFromGroup(window);
+            }
+        }
+    }
+
     private void ToggleAutoGroupCheckBox_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is CheckBox checkBox && checkBox.Tag is string processName)

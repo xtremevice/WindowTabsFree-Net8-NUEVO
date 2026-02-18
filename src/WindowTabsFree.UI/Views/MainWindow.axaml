@@ -152,13 +152,22 @@
                                                                                       FontWeight="Bold"
                                                                                       Foreground="#2E7D32"
                                                                                       Margin="20,2,0,5"/>
-                                                                            <Button Content="Focus This Tab" 
-                                                                                   Click="FocusTabButton_Click"
-                                                                                   Tag="{Binding}"
-                                                                                   FontSize="10"
-                                                                                   Height="24"
-                                                                                   Margin="20,0,0,0"
-                                                                                   Background="#81C784"/>
+                                                                            <StackPanel Orientation="Horizontal" Spacing="5" Margin="20,0,0,0">
+                                                                                <Button Content="Focus This Tab" 
+                                                                                       Click="FocusTabButton_Click"
+                                                                                       Tag="{Binding}"
+                                                                                       FontSize="10"
+                                                                                       Height="24"
+                                                                                       Background="#81C784"/>
+                                                                                <Button Content="❌ Remove from Group" 
+                                                                                       Click="RemoveFromGroupButton_Click"
+                                                                                       Tag="{Binding}"
+                                                                                       FontSize="10"
+                                                                                       Height="24"
+                                                                                       Background="#FFCDD2"
+                                                                                       Foreground="#C62828"
+                                                                                       ToolTip.Tip="Remove this window from the group"/>
+                                                                            </StackPanel>
                                                                         </StackPanel>
                                                                     </Border>
                                                                     
@@ -182,13 +191,22 @@
                                                                                       FontSize="9" 
                                                                                       Foreground="Gray"
                                                                                       Margin="20,2,0,0"/>
-                                                                            <Button Content="Focus This Tab" 
-                                                                                   Click="FocusTabButton_Click"
-                                                                                   Tag="{Binding}"
-                                                                                   FontSize="10"
-                                                                                   Height="24"
-                                                                                   Margin="20,5,0,0"
-                                                                                   Background="#E3F2FD"/>
+                                                                            <StackPanel Orientation="Horizontal" Spacing="5" Margin="20,5,0,0">
+                                                                                <Button Content="Focus This Tab" 
+                                                                                       Click="FocusTabButton_Click"
+                                                                                       Tag="{Binding}"
+                                                                                       FontSize="10"
+                                                                                       Height="24"
+                                                                                       Background="#E3F2FD"/>
+                                                                                <Button Content="❌ Remove from Group" 
+                                                                                       Click="RemoveFromGroupButton_Click"
+                                                                                       Tag="{Binding}"
+                                                                                       FontSize="10"
+                                                                                       Height="24"
+                                                                                       Background="#FFCDD2"
+                                                                                       Foreground="#C62828"
+                                                                                       ToolTip.Tip="Remove this window from the group"/>
+                                                                            </StackPanel>
                                                                         </StackPanel>
                                                                     </Border>
                                                                 </StackPanel>
