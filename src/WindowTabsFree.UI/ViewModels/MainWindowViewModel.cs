@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly System.Timers.Timer _refreshTimer;
     private ObservableCollection<WindowInfo> _windows = new();
     private ObservableCollection<TabGroup> _tabGroups = new();
+    private ObservableCollection<TabGroup> _manualTabGroups = new();
     private TabGroup? _selectedTabGroup;
     private WindowInfo? _selectedWindow;
 
@@ -55,18 +56,26 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _tabGroups = value;
             OnPropertyChanged(nameof(TabGroups));
-            OnPropertyChanged(nameof(ManualTabGroups));
+            // Update cached manual groups
+            UpdateManualTabGroups();
         }
     }
 
     public ObservableCollection<TabGroup> ManualTabGroups
     {
-        get
+        get => _manualTabGroups;
+        private set
         {
-            // Return only manually created groups (not auto-grouped)
-            var manualGroups = _tabGroups.Where(g => !g.IsAutoGrouped).ToList();
-            return new ObservableCollection<TabGroup>(manualGroups);
+            _manualTabGroups = value;
+            OnPropertyChanged(nameof(ManualTabGroups));
         }
+    }
+
+    private void UpdateManualTabGroups()
+    {
+        // Cache filtered manual groups to avoid recreating on every access
+        var manualGroups = _tabGroups.Where(g => !g.IsAutoGrouped).ToList();
+        ManualTabGroups = new ObservableCollection<TabGroup>(manualGroups);
     }
 
     public TabGroup? SelectedTabGroup
@@ -175,7 +184,6 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
             TabGroups = new ObservableCollection<TabGroup>(groups);
-            OnPropertyChanged(nameof(ManualTabGroups)); // Notify manual groups changed too
         });
     }
 
